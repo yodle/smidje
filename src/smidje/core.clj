@@ -1,4 +1,4 @@
-(ns cljs-proof.core)
+(ns smidje.core)
 
 (defn foo
   "I don't do a whole lot."

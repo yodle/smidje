@@ -1,6 +1,6 @@
-(ns cljs-proof.core-test
+(ns smidje.core-test
   (:require [clojure.test :refer :all]
-            [cljs-proof.core :refer :all]))
+            [smidje.core :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."
