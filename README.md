@@ -1,6 +1,6 @@
 # cljs-proof
 
-A Clojure library designed to ... well, that part is up to you.
+A little library for cljs testing and mocking
 
 ## Usage
 
