@@ -1,4 +1,4 @@
-# cljs-proof
+# smidje
 
 A little library for cljs testing and mocking
 
