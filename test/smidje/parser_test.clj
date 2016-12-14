@@ -10,5 +10,4 @@
   '((+ 1 1) => 2))
 
 (m/fact "simple addition"
-      (parser/parse simple-addition-fact) => im/simple-addition-assertion)
-
+      (parser/parse simple-addition-fact) => [im/simple-addition-assertion])
