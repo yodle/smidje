@@ -1,9 +1,20 @@
-(ns smidje.cljs-generator.test-builder)
+(ns smidje.cljs-generator.test-builder
+    (:require [smidje.arrows :refer :all]))
+
+(defn do-arrow [arrow]
+      (cond
+        (= arrow '=>) 'cljs.core/=
+        (= arrow '=not>) 'cljs.core/not=
+        (= arrow '=not=>) 'cljs.core/not=
+        :else (throw (Exception. (format "Unknown arrow given: %s | Valid arrows: %s"
+                                         arrow
+                                         arrow-set)))))
 
 (defn generate-assertion [assertion]
-  (let [test-function#   (:call-form assertion)
-        expected-result# (:expected-result assertion)]
-    `(cljs.test/is (cljs.core/= ~test-function# ~expected-result#))))
+      (let [{test-function#   :call-form
+             expected-result# :expected-result
+             arrow#           :arrow} assertion]
+           `(cljs.test/is (~(do-arrow arrow#) ~test-function# ~expected-result#))))
 
 (defn generate-test [test-definition]
   (let [assertions# (:assertions test-definition)
