@@ -3,23 +3,24 @@
             [smidje.intermediate-maps :as im]
             [smidje.cljs-generator.test-builder :refer :all]))
 
-(def single-expect-match-cljs
-  `(do
+(defn single-expect-match-cljs [simple-addition-fn]
+  `(cljs.core/do
      (cljs.test/deftest ~(symbol "addition is simple")
-       (cljs.test/is (= (+ 1 1) 2)))))
+       (cljs.test/is (cljs.core/= ~simple-addition-fn 2)))))
 
 (fact "a single expect match arrow fact"
-      (generate-tests im/single-expect-match-map) => single-expect-match-cljs)
+      (generate-tests (im/single-expect-match-map ..simple-addition..))
+      => (single-expect-match-cljs ..simple-addition..))
 
 (defn multiple-expect-match-cljs [simple-addition-fn ternary-addition-fn]
-  `(do
-     (cljs.test/deftest ~(symbol "multiple assertion fact")
+  `(cljs.core/do
+     (cljs.test/deftest ~(symbol "more addition testing")
        (cljs.test/is (cljs.core/= ~simple-addition-fn 2))
        (cljs.test/is (cljs.core/= ~ternary-addition-fn 3)))))
 
 (fact "multiple assertion fact"
       (generate-tests (im/multiple-expect-match-map ..simple-addition.. ..ternary-addition..))
-      => (multiple-expect-match-cljs ..simple-addition-fn.. ..ternary-addition-fn..))
+      => (multiple-expect-match-cljs ..simple-addition.. ..ternary-addition..))
 
 (comment
 
