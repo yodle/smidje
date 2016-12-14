@@ -21,7 +21,7 @@
 
 (defn- parse
   [forms]
-  (loop [result (vec []) input forms]
+  (loop [result [] input forms]
     ; TODO: check for provided mocks
     ; TODO: assertions must be before provided mocks
     ; TODO: error messages on bad syntax
