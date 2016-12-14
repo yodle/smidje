@@ -4,7 +4,7 @@
             [smidje.cljs-generator.test-builder :refer :all]))
 
 (defn single-expect-match-cljs [simple-addition-fn]
-  `(cljs.core/do
+  `(do
      (cljs.test/deftest ~(symbol "addition is simple")
        (cljs.test/is (cljs.core/= ~simple-addition-fn 2)))))
 
@@ -13,7 +13,7 @@
       => (single-expect-match-cljs ..simple-addition..))
 
 (defn multiple-expect-match-cljs [simple-addition-fn ternary-addition-fn]
-  `(cljs.core/do
+  `(do
      (cljs.test/deftest ~(symbol "more addition testing")
        (cljs.test/is (cljs.core/= ~simple-addition-fn 2))
        (cljs.test/is (cljs.core/= ~ternary-addition-fn 3)))))
