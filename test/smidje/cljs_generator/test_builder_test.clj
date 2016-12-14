@@ -6,7 +6,7 @@
   {:smidje/namespace 'smidje.core-test
    :smidje/file ""})
 
-(def simple-addition-assertion-1
+(def simple-addition-assertion
   {:expected-result-form '2
    :expected-result 2
    :arrow '=>
@@ -14,7 +14,7 @@
    :function-under-test (clojure.core/fn [] (+ 1 1))
    :position 1})
 
-(def simple-addition-assertion-2
+(def ternary-addition-assertion
   {:expected-result-form '3
    :expected-result 3
    :arrow '=>
@@ -24,10 +24,10 @@
 
 (def single-expect-match-map
   (merge
-   test-metadata
-   {:smidje/source '(fact (+ 1 1) => 2)
+    test-metadata
+    {:smidje/source '(fact (+ 1 1) => 2)
     :tests `[:description "addition is simple"
-             :assertions [~simple-addition-assertion-1]]}))
+             :assertions [~simple-addition-assertion]]}))
 
 (def single-expect-match-cljs
   '(cljs.test/deftest
@@ -38,11 +38,11 @@
 
 (def multiple-expect-match-map
   (merge
-   test-metadata
-   {:smidje/source '(fact (+ 1 1) => 2 (+ 1 1 1) => 3)
+    test-metadata
+    {:smidje/source '(fact (+ 1 1) => 2 (+ 1 1 1) => 3)
     :tests `[:description "more addition testing"
-             :assertions [~simple-addition-assertion-1
-                          ~simple-addition-assertion-2]]}))
+             :assertions [~simple-addition-assertion
+                          ~ternary-addition-assertion]]}))
 
 (def multiple-expect-match-cljs
   '(cljs.test/deftest
