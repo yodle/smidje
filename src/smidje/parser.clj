@@ -19,7 +19,7 @@
   (or (= form '=>)
       (= form '=not=>)))
 
-(defn- parse
+(defn parse
   [forms]
   (loop [result (vec []) input forms]
     (if (and (> (count input) 2)
