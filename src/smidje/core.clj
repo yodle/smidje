@@ -6,8 +6,7 @@
   (println x "Hello, World!"))
 
 (ns cljs-proof.test-framework
-  (:require [clojure.test :refer :all]
-            [clojure.core.async :refer :all]))
+  (:require [clojure.test :refer :all]))
 
 (defn done []
   )
