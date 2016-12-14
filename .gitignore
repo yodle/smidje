@@ -13,3 +13,4 @@ cljs-proof.iml
 .idea/
 out/
 resources/
+*.iml
