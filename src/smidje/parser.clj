@@ -3,16 +3,36 @@
 
 (declare generate)
 
+(def provided "provided")
+
+(defn- provided-form?
+  [form]
+  (and (seq? form)
+       (= (first form) 'provided)))
+
+(defn- has-provided-form? [input]
+  (and (> (count input) 3)
+       (provided-form? (nth input 3))))
+
+(defn- parse-provided
+  [forms]
+  (if (has-provided-form? forms)
+      {:provided (nth forms 3)}
+      {}))
+
 (defn- parse-equals
   [forms]
   (let [call-form (nth forms 0)
         arrow (nth forms 1)
         expected-form (nth forms 2)]
+    (merge 
     {:call-form            call-form
      :function-under-test    `'~call-form
      :arrow                arrow
      :expected-result      expected-form
-     :expected-result-form `'~expected-form}))
+     :expected-result-form `'~expected-form}
+     (parse-provided forms))))
+
 
 (defn- is-arrow
   [form]
@@ -27,7 +47,7 @@
     ; TODO: error messages on bad syntax
     (if (and (> (count input) 2)
              (is-arrow (second input)))
-      (recur (conj result (parse-equals input)) (drop 3 input))
+      (recur (conj result (parse-equals input)) (drop (if (has-provided-form? input) 4 3 ) input))
       result)))
 
 (defmacro fact
