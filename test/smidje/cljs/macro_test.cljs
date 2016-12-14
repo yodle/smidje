@@ -6,4 +6,6 @@
 ;(testmacro {:tests [{:name "mytest", :assertions [{:function-under-test (+ 1 1), :expected-result 2}]}]})
 
 (fact "name"
-  (+ 1 1) => 2)
+  (+ 1 1) => 2
+  (+ 1 3) =not=> 2
+  (+ 1 3) =not> 2)
