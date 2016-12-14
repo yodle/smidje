@@ -1,17 +1,37 @@
 (ns smidje.parser
   (:require [smidje.arrows :refer :all]))
 
+(defn- parse-equals
+  [forms]
+  (let [call-form (nth forms 0)
+        arrow (nth forms 1)
+        expected-form (nth forms 2)]
+    {:call-form call-form
+     :call-form-no-eval `'~call-form
+     :arrow     arrow
+     :expected-result expected-form
+     :expected-result-form `'~expected-form}))
+
 (defn- parse
   [forms]
-  (let [call-form (nth forms 1)
-        arrow (nth forms 2)
-        expected-form (nth forms 3)]
-    {:call-form call-form
-     :arrow     arrow
-     :expected-result expected-form}))
+  (loop [result (vec []) input forms]
+    ; TODO: more sophisticated arrow detection
+    (if (and (> (count input) 2)
+             (= (second input) '=>))
+      (recur (conj result (parse-equals input)) (drop 3 input))
+      result)))
 
 (defmacro fact
   [& _]
-  ; arrow checking
-  ; evaluation of call-form
-  (parse &form))
+  (let [name (if (string? (second &form))
+               (clojure.string/replace (second &form) #"[^\w\d]+" "-")
+               (second &form))
+        fact-forms (drop 2 &form)]
+    (map #(assoc % :name name) (parse fact-forms))))
+
+(comment
+  (macroexpand
+    '(fact "what a fact"
+          (+ 1 1) => 2
+          (+ 2 2) => 4))
+)
