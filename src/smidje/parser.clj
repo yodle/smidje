@@ -22,6 +22,9 @@
 (defn- parse
   [forms]
   (loop [result (vec []) input forms]
+    ; TODO: check for provided mocks
+    ; TODO: assertions must be before provided mocks
+    ; TODO: error messages on bad syntax
     (if (and (> (count input) 2)
              (is-arrow (second input)))
       (recur (conj result (parse-equals input)) (drop 3 input))
@@ -33,15 +36,17 @@
                (clojure.string/replace (second &form) #"[^\w\d]+" "-")
                (second &form))
         fact-forms (drop 2 &form)]
-    (-> (map #(assoc % :name name) (parse fact-forms))
+    (-> {:name name
+         :assertions (parse fact-forms)}
         (generate))))
 
-(defn generate [& name]
+(defn generate [name]
   name)
 
 (comment
   (macroexpand
     '(fact "what a fact"
            (+ 1 1) => 2
-           (+ 2 2) =not=> 3))
+           (+ 2 2) =not=> 3
+           (provided "stuff" "that" "provides")))
 )
