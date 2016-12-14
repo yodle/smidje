@@ -14,7 +14,7 @@
      :expected-result expected-form
      :expected-result-form `'~expected-form}))
 
-(defn- parse
+(defn parse
   [forms]
   (loop [result (vec []) input forms]
     ; TODO: more sophisticated arrow detection
