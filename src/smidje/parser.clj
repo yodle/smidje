@@ -8,18 +8,22 @@
   (let [call-form (nth forms 0)
         arrow (nth forms 1)
         expected-form (nth forms 2)]
-    {:call-form call-form
-     :call-form-no-eval `'~call-form
-     :arrow     arrow
-     :expected-result expected-form
+    {:call-form            call-form
+     :call-form-no-eval    `'~call-form
+     :arrow                arrow
+     :expected-result      expected-form
      :expected-result-form `'~expected-form}))
 
-(defn parse
+(defn- is-arrow
+  [form]
+  (or (= form '=>)
+      (= form '=not=>)))
+
+(defn- parse
   [forms]
   (loop [result (vec []) input forms]
-    ; TODO: more sophisticated arrow detection
     (if (and (> (count input) 2)
-             (= (second input) '=>))
+             (is-arrow (second input)))
       (recur (conj result (parse-equals input)) (drop 3 input))
       result)))
 
@@ -39,5 +43,5 @@
   (macroexpand
     '(fact "what a fact"
            (+ 1 1) => 2
-           (+ 2 2) => 4))
+           (+ 2 2) =not=> 3))
 )
