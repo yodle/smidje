@@ -10,23 +10,30 @@
    :arrow '=>
    :call-form '(+ 1 1)})
 
+(def simple-addtion-not-assertion
+  {:expected-result-form `'3
+   :expected-result 3
+   :arrow '=not=>
+   :call-form '(+ 1 1)})
+
 (def ternary-addition-assertion
   {:expected-result-form `'3
    :expected-result 3
    :arrow '=>
    :call-form '(+ 1 1 1)})
 
-(def single-expect-match-map
+(defn expect-match-map [name & assertions]
   (merge
    test-metadata
-   {:smidje/source '(fact (+ 1 1) => 2)
-    :tests [{:name "addition is simple"
-             :assertions [simple-addition-assertion]}]}))
+   {:tests [{:name name
+             :assertions assertions}]}))
 
-(def multiple-expect-match-map
-  (merge
-   test-metadata
-   {:smidje/source '(fact (+ 1 1) => 2 (+ 1 1 1) => 3)
-    :tests [{:name "more addition testing"
-             :assertions [simple-addition-assertion
-                          ternary-addition-assertion]}]}))
+(def single-expect-match-map (expect-match-map "addition is simple"
+                                               simple-addition-assertion))
+
+(def multiple-expect-match-map (expect-match-map "more addition testing"
+                                                 simple-addition-assertion
+                                                 ternary-addition-assertion))
+
+(def single-expect-unequal-map (expect-match-map "addition is well defined"
+                                                 simple-addtion-not-assertion))
