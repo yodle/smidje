@@ -13,7 +13,7 @@
 
 (defn generate-tests [test-runtime]
   (let [tests# (:tests test-runtime)]
-     `(do ~@(map generate-test tests#))))
+     `(cljs.core/do ~@(map generate-test tests#))))
 
 (defmacro testmacro [test-runtime]
   (generate-tests test-runtime))
