@@ -1,0 +1,3 @@
+(ns smidje.arrows)
+
+(def => "=>")
