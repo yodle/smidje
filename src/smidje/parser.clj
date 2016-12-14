@@ -1,6 +1,8 @@
 (ns smidje.parser
   (:require [smidje.arrows :refer :all]))
 
+(declare generate)
+
 (defn- parse
   [forms]
   (let [call-form (nth forms 1)
@@ -14,4 +16,9 @@
   [& _]
   ; arrow checking
   ; evaluation of call-form
-  (parse &form))
+
+  (-> (parse &form)
+      (generate)))
+
+(defn generate [_ &]
+  (println "Implement me!"))
