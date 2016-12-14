@@ -1,0 +1,3 @@
+- test
+  - post
+    - lein trampoline doo phantom test once
