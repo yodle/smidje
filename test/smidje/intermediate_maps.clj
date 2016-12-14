@@ -22,15 +22,15 @@
 
 (defn single-expect-match-map [simple-addition-fn]
   (merge
-    test-metadata
-    {:smidje/source '(fact (+ 1 1) => 2)
-     :tests [{:name "addition is simple"
-              :assertions [(simple-addition-assertion simple-addition-fn)]}]}))
+   test-metadata
+   {:smidje/source '(fact (+ 1 1) => 2)
+    :tests [{:name "addition is simple"
+             :assertions [(simple-addition-assertion simple-addition-fn)]}]}))
 
 (defn multiple-expect-match-map [simple-addition-fn ternary-addition-fn]
   (merge
-    test-metadata
-    {:smidje/source '(fact (+ 1 1) => 2 (+ 1 1 1) => 3)
-     :tests [{:name "more addition testing"
-              :assertions [(simple-addition-assertion simple-addition-fn)
-                           (ternary-addition-assertion ternary-addition-fn)]}]}))
+   test-metadata
+   {:smidje/source '(fact (+ 1 1) => 2 (+ 1 1 1) => 3)
+    :tests [{:name "more addition testing"
+             :assertions [(simple-addition-assertion simple-addition-fn)
+                          (ternary-addition-assertion ternary-addition-fn)]}]}))
