@@ -10,4 +10,10 @@
   '((+ 1 1) => 2))
 
 (m/fact "simple addition"
-      (parser/parse simple-addition-fact) => [im/simple-addition-assertion])
+        (parser/parse simple-addition-fact) => [im/simple-addition-assertion])
+
+(def simple-addition-unequal-fact
+  '((+ 1 1) =not=> 3))
+
+(m/fact "simple addition unequal"
+        (parser/parse simple-addition-unequal-fact) => [im/simple-addtion-not-assertion])
