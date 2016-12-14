@@ -46,7 +46,8 @@
 
 (def multiple-expect-match-cljs
   '(cljs.test/deftest
-     (cljs.test/is (clojure.core/= (clojure.core + 1 1 1) 2))))
+     (cljs.test/is (clojure.core/= (clojure.core (+ 1 1) 2)))
+     (cljs.test/is (clojure.core/= (clojure.core (+ 1 1 1)) 3))))
 
 (fact "multiple assertion fact"
       (generate-tests multiple-expect-match-map) => multiple-expect-match-cljs)
