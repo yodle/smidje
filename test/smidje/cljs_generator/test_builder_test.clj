@@ -4,19 +4,22 @@
             [smidje.cljs-generator.test-builder :refer :all]))
 
 (def single-expect-match-cljs
-  '(cljs.test/deftest
-     (cljs.test/is (clojure.core/= (clojure.core/+ 1 1) 2))))
+  `(do
+     (cljs.test/deftest ~(symbol "addition is simple")
+       (cljs.test/is (= (+ 1 1) 2)))))
 
 (fact "a single expect match arrow fact"
       (generate-tests im/single-expect-match-map) => single-expect-match-cljs)
 
-(def multiple-expect-match-cljs
-  '(cljs.test/deftest
-     (cljs.test/is (clojure.core/= (clojure.core (+ 1 1) 2)))
-     (cljs.test/is (clojure.core/= (clojure.core (+ 1 1 1)) 3))))
+(defn multiple-expect-match-cljs [simple-addition-fn ternary-addition-fn]
+  `(do
+     (cljs.test/deftest ~(symbol "multiple assertion fact")
+       (cljs.test/is (cljs.core/= ~simple-addition-fn 2))
+       (cljs.test/is (cljs.core/= ~ternary-addition-fn 3)))))
 
 (fact "multiple assertion fact"
-      (generate-tests im/multiple-expect-match-map) => multiple-expect-match-cljs)
+      (generate-tests (im/multiple-expect-match-map ..simple-addition.. ..ternary-addition..))
+      => (multiple-expect-match-cljs ..simple-addition-fn.. ..ternary-addition-fn..))
 
 (comment
 
