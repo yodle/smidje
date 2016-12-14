@@ -1,7 +1,7 @@
 (ns smidje.cljs-generator.test-builder)
 
 (defn generate-assertion [assertion]
-  (let [test-function#   (:function-under-test assertion)
+  (let [test-function#   (:call-form assertion)
         expected-result# (:expected-result assertion)]
     `(cljs.test/is (cljs.core/= ~test-function# ~expected-result#))))
 

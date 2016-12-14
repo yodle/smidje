@@ -1,5 +1,6 @@
 (ns smidje.parser
-  (:require [smidje.arrows :refer :all]))
+  (:require [smidje.arrows :refer :all]
+            [smidje.cljs-generator.test-builder :as cljsbuilder]))
 
 (declare generate)
 
@@ -27,7 +28,6 @@
         expected-form (nth forms 2)]
     (merge 
     {:call-form            call-form
-     :function-under-test    `'~call-form
      :arrow                arrow
      :expected-result      expected-form
      :expected-result-form `'~expected-form}
@@ -56,12 +56,12 @@
                (clojure.string/replace (second &form) #"[^\w\d]+" "-")
                (second &form))
         fact-forms (drop 2 &form)]
-    (-> {:name name
-         :assertions (parse fact-forms)}
+    (-> {:tests [{:name name
+         :assertions (parse fact-forms)}]}
         (generate))))
 
-(defn generate [name]
-  name)
+(defn generate [testmap]
+  (cljsbuilder/generate-tests testmap))
 
 (comment
   (macroexpand
