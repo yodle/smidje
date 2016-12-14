@@ -9,7 +9,7 @@
         arrow (nth forms 1)
         expected-form (nth forms 2)]
     {:call-form            call-form
-     :call-form-no-eval    `'~call-form
+     :function-under-test    `'~call-form
      :arrow                arrow
      :expected-result      expected-form
      :expected-result-form `'~expected-form}))
