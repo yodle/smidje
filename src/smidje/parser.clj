@@ -21,7 +21,7 @@
 
 (defn- parse
   [forms]
-  (loop [result (vec []) input forms]
+  (loop [result [] input forms]
     (if (and (> (count input) 2)
              (is-arrow (second input)))
       (recur (conj result (parse-equals input)) (drop 3 input))
