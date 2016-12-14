@@ -1,6 +1,8 @@
 (ns smidje.parser
   (:require [smidje.arrows :refer :all]))
 
+(declare generate)
+
 (defn- parse-equals
   [forms]
   (let [call-form (nth forms 0)
@@ -27,11 +29,15 @@
                (clojure.string/replace (second &form) #"[^\w\d]+" "-")
                (second &form))
         fact-forms (drop 2 &form)]
-    (map #(assoc % :name name) (parse fact-forms))))
+    (-> (map #(assoc % :name name) (parse fact-forms))
+        (generate))))
+
+(defn generate [& name]
+  name)
 
 (comment
   (macroexpand
     '(fact "what a fact"
-          (+ 1 1) => 2
-          (+ 2 2) => 4))
+           (+ 1 1) => 2
+           (+ 2 2) => 4))
 )
