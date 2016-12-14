@@ -4,13 +4,14 @@
 (defn do-arrow [arrow]
       (cond
         (= arrow '=>) 'cljs.core/=
+        (= arrow '=not>) 'cljs.core/not=
         (= arrow '=not=>) 'cljs.core/not=
         :else (throw (Exception. (format "Unknown arrow given: %s | Valid arrows: %s"
                                          arrow
                                          arrow-set)))))
 
 (defn generate-assertion [assertion]
-      (let [{test-function#   :function-under-test
+      (let [{test-function#   :call-form
              expected-result# :expected-result
              arrow#           :arrow} assertion]
            `(cljs.test/is (~(do-arrow arrow#) ~test-function# ~expected-result#))))
