@@ -18,7 +18,7 @@
                              :expected-result 2
                              :arrow =>
                              :provided {:bar {:mock-config {nil {:result 3
-                                                       :calls 2
+                                                       :calls 1
                                                        :arrow =>}}
                                               :function bar}}}]}]})
 
