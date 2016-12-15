@@ -46,7 +46,7 @@
     (merge
       {:call-form            call-form
        :arrow                arrow
-       ;:expected-result      expected-form
+       :expected-result      expected-form
        :expected-result-form `'~expected-form}
       (parse-expected expected-form)
       (parse-provided forms))))
