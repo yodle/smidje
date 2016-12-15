@@ -4,6 +4,11 @@
 
 (declare generate)
 
+(defn- is-arrow
+  [form]
+  (or (= form '=>)
+      (= form '=not=>)))
+
 (def provided "provided")
 
 (defn- provided-form?
@@ -99,11 +104,6 @@
      :expected-result-form `'~expected-form}
      (parse-provided forms))))
 
-
-(defn- is-arrow
-  [form]
-  (or (= form '=>)
-      (= form '=not=>)))
 
 (defn parse
   [forms]
