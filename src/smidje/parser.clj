@@ -81,7 +81,7 @@
     {:provided (->> (nth forms 3)
                     rest
                     seperate-provided-forms
-                    (mapcat flatten-provided)
+                    (mapcat unnest-provided)
                     (map build-provided-map)
                     (group-by :mock-function)
                     (map (fn [x] {:mock-function (first x) :return (aggregate-paramater-maps (second x))} ))
