@@ -28,3 +28,8 @@
 
 (defmacro testmacro [test-runtime]
   (generate-tests test-runtime))
+
+(defn generate-expected-exception [exception-definition]
+  (let [expected-exception (:throws-exception exception-definition)
+        expected-result-form (:expected-result-form exception-definition)]
+    `(cljs.test/is (cljs.test/thrown? ~(symbol expected-exception) ~expected-result-form))))
