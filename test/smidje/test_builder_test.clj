@@ -3,7 +3,7 @@
             [smidje.cljs-generator.test-builder :as builder]))
 
 (def simple-exception
-  '(cljs.test/is (cljs.test/thrown? Exception (throw Exception))))
+  '(cljs.test/is (thrown? Exception (throw Exception))))
 
 (m/fact "simple throws"
   (builder/generate-expected-exception {:throws-exception 'Exception
@@ -16,7 +16,7 @@
 
 (def exception-test
   '(cljs.test/deftest foo-throws-exception
-     (cljs.test/is (cljs.test/thrown? InvalidFooError (foo nil)))))
+     (cljs.test/is (thrown? InvalidFooError (foo nil)))))
 
 (m/fact "simple tests produce assert or exception forms"
   (builder/generate-test {:name "foo-returns-2"
