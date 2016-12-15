@@ -3,9 +3,30 @@
     (:require-macros [smidje.parser :refer [fact]]
                      [smidje.cljs-generator.test-builder :refer [testmacro]]))
 
-;(testmacro {:tests [{:name "mytest", :assertions [{:function-under-test (+ 1 1), :expected-result 2}]}]})
+(defn bar []
+  1)
 
-(fact "name"
-  (+ 1 1) => 2
-  (+ 1 3) =not=> 2
-  (+ 1 3) =not> 2)
+(defn foo []
+  (bar))
+
+(println (macroexpand-1 '(testmacro {:tests [
+                    {:name "providedtest",
+                     :assertions
+                           [{:call-form (foo),
+                             :expected-result 2
+                             :arrow =>
+                             :provided [{:mock-function bar
+                                         :return {nil {:result 2
+                                                       :calls 1
+                                                       :arrow =>}}}]}]}]})))
+
+;(testmacro {:tests [
+;                    {:name "mytest",
+;                     :assertions
+;                           [{:call-form (+ 1 1),
+;                             :expected-result 2}]}]})
+
+;(fact "name"
+;  (+ 1 1) => 2
+;  (+ 1 3) =not=> 2
+;  (+ 1 3) =not> 2)
