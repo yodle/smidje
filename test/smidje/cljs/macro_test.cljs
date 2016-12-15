@@ -1,5 +1,6 @@
 (ns smidje.cljs.macro-test
-    (:require [cljs.test :refer [deftest is]])
+    (:require [cljs.test :refer [deftest is]]
+              [cljs.test :refer [deftest is]])
     (:require-macros [smidje.parser :refer [fact]]
                      [smidje.cljs-generator.test-builder :refer [testmacro]]))
 
@@ -17,7 +18,7 @@
                              :arrow =>
                              :provided [{:mock-function bar
                                          :return {nil {:result 2
-                                                       :calls 2
+                                                       :calls 1
                                                        :arrow =>}}}]}]}]})
 
 ;(testmacro {:tests [
