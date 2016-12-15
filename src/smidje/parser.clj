@@ -15,21 +15,39 @@
   (and (> (count input) 3)
        (provided-form? (nth input 3))))
 
+(defn- gen-provided-sym
+  [fn1 fn2]
+  (symbol (str ".." (gensym (str fn1 "->" fn2)) ".." ))) 
+
 (defn- flatten-provided
-  [provideds]
-  provideds)
+  [provided]
+  (let [match (first provided)]
+    (if (some list? match)
+      (let [provided-fn (first match)]
+        (loop [provided-flattened [provided-fn] flattened-paramaters [] r (rest match)]
+          (cond
+            (empty? r) (conj flattened-paramaters (into []  (conj (rest provided ) (flatten  provided-flattened))))
+            (and (list? (first r))
+                 (not-empty (first r)))
+               (let [sub-provide (first r)
+                     sub-fn (first sub-provide)
+                     metaconst (gen-provided-sym provided-fn sub-fn)]
+                 (recur (conj provided-flattened metaconst) (into flattened-paramaters (flatten-provided [sub-provide '=> metaconst])) (rest r)))
+            :else (recur (conj provided-flattened (first r)) flattened-paramaters (rest r) )
+            )))
+      [provided]
+      )))
 
 (defn- seperate-provided-forms
   [forms]
-  (loop [result [] current-form (reverse  (take 3 forms)) input (drop 3 forms)]
+  (loop [result [] current-form (into []  (take 3 forms)) input (drop 3 forms)]
     (cond
-      (empty? input) (conj result (reverse  current-form))
+      (empty? input) (conj result current-form)
       (and (> (count input) 2)
            (list? (first input))
            (is-arrow (second input)))
-      (recur (conj result (reverse  current-form)) (reverse  (take 3 input)) (drop 3 input))
-      :else (recur result (conj current-form (first input)) (rest input))
-
+      (recur (conj result current-form) (into []  (take 3 input)) (drop 3 input))
+      :else (recur result (conj current-form (first input)) (rest input)) 
       )
     )
   )
