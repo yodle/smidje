@@ -13,8 +13,8 @@
 (defn generate-stateful-mock
   "generates a mock given a mock-data object of the form
   {<param-list> {:result <return value>
-                          :calls  <expected times called>
-                          :arrow  '=>'}}"
+                 :calls  <expected times called>
+                 :arrow  '=>}}"
   [mock-config]
   (let [mock-state-var (gensym "mock-state-var")]
     `(cljs.core/let [~mock-state-var (cljs.core/atom {:mock-config ~mock-config})]
