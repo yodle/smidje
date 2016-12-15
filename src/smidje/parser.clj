@@ -56,10 +56,7 @@
            (is-arrow (second input)))
         (recur (conj result current-form) (into []  (take 3 input)) (drop 3 input))
 
-      :else (recur result (conj current-form (first input)) (rest input))
-      )
-    )
-  )
+      :else (recur result (conj current-form (first input)) (rest input)))))
 
 (defn- aggregate-paramater-maps
    [paramater-maps]
