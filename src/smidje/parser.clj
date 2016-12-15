@@ -27,12 +27,14 @@
         (loop [provided-flattened [provided-fn] flattened-paramaters [] r (rest match)]
           (cond
             (empty? r) (conj flattened-paramaters (into []  (conj (rest provided ) (flatten  provided-flattened))))
+
             (and (list? (first r))
                  (not-empty (first r)))
                (let [sub-provide (first r)
                      sub-fn (first sub-provide)
                      metaconst (gen-provided-sym provided-fn sub-fn)]
                  (recur (conj provided-flattened metaconst) (into flattened-paramaters (flatten-provided [sub-provide '=> metaconst])) (rest r)))
+
             :else (recur (conj provided-flattened (first r)) flattened-paramaters (rest r) )
             )))
       [provided]
@@ -43,21 +45,47 @@
   (loop [result [] current-form (into []  (take 3 forms)) input (drop 3 forms)]
     (cond
       (empty? input) (conj result current-form)
+
       (and (> (count input) 2)
            (list? (first input))
            (is-arrow (second input)))
-      (recur (conj result current-form) (into []  (take 3 input)) (drop 3 input))
-      :else (recur result (conj current-form (first input)) (rest input)) 
+        (recur (conj result current-form) (into []  (take 3 input)) (drop 3 input))
+
+      :else (recur result (conj current-form (first input)) (rest input))
       )
     )
   )
 
+(defn- aggregate-paramater-maps
+   [paramater-maps]
+   (apply hash-map (mapcat
+                    (fn [x]  [(:paramaters x) (dissoc x :paramaters :mock-function)])
+                    paramater-maps)
+          ))
+
+(defn- build-provided-map
+  [provided]
+  (merge
+   (apply hash-map (drop 3 provided)) 
+   {:mock-function (first (first provided))
+    :paramaters (rest (first provided))
+    :arrow (second provided)
+    :result (nth provided 2)
+    }))
+
 (defn- parse-provided
   [forms]
   (if (has-provided-form? forms)
-    {:providedraw (nth forms 3)
-     }
-      {}))
+    {:provided (->> (nth forms 3)
+                    rest
+                    seperate-provided-forms
+                    (mapcat flatten-provided)
+                    (map build-provided-map)
+                    (group-by :mock-function)
+                    (map (fn [x] {:mock-function (first x) :return (aggregate-paramater-maps (second x))} ))
+                    )
+    }
+    {}))
 
 (defn- parse-equals
   [forms]
