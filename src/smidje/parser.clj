@@ -15,10 +15,30 @@
   (and (> (count input) 3)
        (provided-form? (nth input 3))))
 
+(defn- flatten-provided
+  [provideds]
+  provideds)
+
+(defn- seperate-provided-forms
+  [forms]
+  (loop [result [] current-form (reverse  (take 3 forms)) input (drop 3 forms)]
+    (cond
+      (empty? input) (conj result (reverse  current-form))
+      (and (> (count input) 2)
+           (list? (first input))
+           (is-arrow (second input)))
+      (recur (conj result (reverse  current-form)) (reverse  (take 3 input)) (drop 3 input))
+      :else (recur result (conj current-form (first input)) (rest input))
+
+      )
+    )
+  )
+
 (defn- parse-provided
   [forms]
   (if (has-provided-form? forms)
-      {:provided (nth forms 3)}
+    {:providedraw (nth forms 3)
+     }
       {}))
 
 (defn- parse-equals
