@@ -6,9 +6,8 @@
                           :calls  <expected times called>
                           :arrow  '=>'}}"
   [mock-config]
-  '(cljs.core/let [mock-state# (cljs.core/atom {:mock-config mock-config})]
+  `(cljs.core/let [mock-state# (cljs.core/atom {:mock-config ~mock-config})]
     (fn[& params#]
-      (cljs.core/if
-        (cljs.core/contains? (get @mock-state# :mock-config) params#)
-        (cljs.core/get-in @mock-state# [:mock-config params# :result])
-        (cljs.core/throw (Exception. (str "mock called with " params# " but no response was configured")))))))
+      (if
+        (cljs.core/contains? (cljs.core/get (cljs.core/deref mock-state#) :mock-config) params#)
+        (cljs.core/get-in (cljs.core/deref mock-state#) [:mock-config params# :result])))))
