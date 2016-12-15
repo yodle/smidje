@@ -9,7 +9,7 @@
 (defn foo []
   (bar))
 
-(println (macroexpand-1 '(testmacro {:tests [
+(testmacro {:tests [
                     {:name "providedtest",
                      :assertions
                            [{:call-form (foo),
@@ -17,8 +17,8 @@
                              :arrow =>
                              :provided [{:mock-function bar
                                          :return {nil {:result 2
-                                                       :calls 1
-                                                       :arrow =>}}}]}]}]})))
+                                                       :calls 2
+                                                       :arrow =>}}}]}]}]})
 
 ;(testmacro {:tests [
 ;                    {:name "mytest",
