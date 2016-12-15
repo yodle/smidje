@@ -22,6 +22,18 @@
    :arrow '=>
    :call-form '(+ 1 1 1)})
 
+(def provided-mock-config
+  {[21] {:result nil
+         :arrow '=>}})
+
+(def provided-assertion
+  {:expected-result-form `':answer
+   :expected-result :answer
+   :arrow '=>
+   :call-form '(test-fn 42)
+   :provided {:mock-function 'foo
+              :return provided-mock-config}})
+
 (defn expect-match-map [name & assertions]
   (merge
    test-metadata
@@ -37,3 +49,6 @@
 
 (def single-expect-unequal-map (expect-match-map "addition is well defined"
                                                  simple-addtion-not-assertion))
+
+(def single-provided-expect-match-map (expect-match-map "universal question"
+                                                        provided-assertion))
