@@ -16,6 +16,11 @@
              arrow#           :arrow} assertion]
            `(cljs.test/is (~(do-arrow arrow#) ~test-function# ~expected-result#))))
 
+(defn generate-expected-exception [exception-definition]
+  (let [expected-exception (:throws-exception exception-definition)
+        expected-result-form (:expected-result-form exception-definition)]
+    `(cljs.test/is (cljs.test/thrown? ~(symbol expected-exception) ~expected-result-form))))
+
 (defn generate-test [test-definition]
   (let [assertions# (:assertions test-definition)
         name#       (:name test-definition)]
@@ -28,3 +33,17 @@
 
 (defmacro testmacro [test-runtime]
   (generate-tests test-runtime))
+
+(defmulti generate-right-hand
+  (fn [assertion]
+    (if (:throws-exception assertion)
+      :generate-expected-exception
+      :generate-assertion)))
+
+(defmethod generate-right-hand :generate-assertion
+  [assertion]
+  (generate-assertion assertion))
+
+(defmethod generate-right-hand :generate-expected-exception
+  [assertion]
+  (generate-expected-exception assertion))
