@@ -1,5 +1,6 @@
 (ns smidje.cljs-generator.test-builder
-    (:require [smidje.arrows :refer :all]))
+    (:require [smidje.arrows :refer :all]
+              [smidje.cljs-generator.mocks :refer [generate-mock]]))
 
 (defn do-arrow [arrow]
       (cond
@@ -10,11 +11,21 @@
                                          arrow
                                          arrow-set)))))
 
+(defn generate-mock-binding [mock-data-map]
+  (let [{mock-config# :returns
+         function-name# :mock-function} mock-data-map]
+    [function-name# (generate-mock mock-config#)]))
+
+(defn generate-mock-bindings [provided]
+  (into [] (reduce conj (map generate-mock-binding provided))))
+
 (defn generate-assertion [assertion]
       (let [{test-function#   :call-form
              expected-result# :expected-result
-             arrow#           :arrow} assertion]
-           `(cljs.test/is (~(do-arrow arrow#) ~test-function# ~expected-result#))))
+             arrow#           :arrow
+             provided#        :provided} assertion]
+           `(cljs.core/with-redefs ~(generate-mock-bindings provided#)
+              (cljs.test/is (~(do-arrow arrow#) ~test-function# ~expected-result#)))))
 
 (defn generate-test [test-definition]
   (let [assertions# (:assertions test-definition)
