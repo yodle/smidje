@@ -10,6 +10,7 @@
 (defn foo []
   (bar))
 
+
 (testmacro {:tests [
                     {:name "providedtest",
                      :assertions
@@ -18,7 +19,7 @@
                              :arrow =>
                              :provided [{:mock-function bar
                                          :return {nil {:result 2
-                                                       :calls 1
+                                                       :calls 2
                                                        :arrow =>}}}]}]}]})
 
 ;(testmacro {:tests [

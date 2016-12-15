@@ -1,6 +1,6 @@
 (ns smidje.cljs-generator.test-builder
     (:require [smidje.arrows :refer [arrow-set]]
-              [smidje.cljs-generator.mocks :refer [generate-mock]]))
+              [smidje.cljs-generator.mocks :refer [generate-stateful-mock]]))
 
 (defn do-arrow [arrow]
       (cond
@@ -14,7 +14,7 @@
 (defn generate-mock-binding [mock-data-map]
   (let [{mock-config# :return
          function-name# :mock-function} mock-data-map]
-    [function-name# (generate-mock mock-config#)]))
+    [function-name# `(:mock-function ~(generate-stateful-mock mock-config#))]))
 
 (defn generate-mock-bindings [provided]
   (into [] (reduce conj (map generate-mock-binding provided))))
