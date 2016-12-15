@@ -38,7 +38,7 @@
                (let [sub-provide (first r)
                      sub-fn (first sub-provide)
                      metaconst (gen-provided-sym provided-fn sub-fn)]
-                 (recur (conj provided-flattened metaconst) (into flattened-paramaters (flatten-provided [sub-provide '=> metaconst])) (rest r)))
+                 (recur (conj provided-flattened metaconst) (into flattened-paramaters (unnest-provided [sub-provide '=> metaconst])) (rest r)))
 
             :else (recur (conj provided-flattened (first r)) flattened-paramaters (rest r) )
             )))
