@@ -22,4 +22,5 @@
 (m/fact "validator recognizes right hand expected exception"
   (throws-form? '(throws)) => true
   (throws-form? '(throws Exception)) => true
-  (throws-form? '(normal-return-path)) => false)
+  (throws-form? '(normal-return-path)) => false
+  (throws-form? 2) => false)
