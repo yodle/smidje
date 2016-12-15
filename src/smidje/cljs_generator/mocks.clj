@@ -1,13 +1,14 @@
 (ns smidje.cljs-generator.mocks)
 
 (defn generate-mock-function [mock-config-atom]
-  `(cljs.core/let [atom-value# (cljs.core/deref ~mock-config-atom)]
-     (cljs.core/fn[& params#]
-       ;(swap! ~mock-config-atom)
+  `(cljs.core/fn[& params#]
+       (cljs.core/swap! ~mock-config-atom
+                        (cljs.core/fn[value#]
+                          (cljs.core/update value# :calls #(cljs.core/merge-with cljs.core/+ % {params# 1}))))
        (if
-         (cljs.core/contains? (cljs.core/get atom-value# :mock-config) params#)
-         (cljs.core/get-in atom-value# [:mock-config params# :result])
-         (throw (js/Error. (cljs.core/str "mock called with undefined params " params#)))))))
+         (cljs.core/contains? (cljs.core/get (cljs.core/deref ~mock-config-atom) :mock-config) params#)
+         (cljs.core/get-in (cljs.core/deref ~mock-config-atom) [:mock-config params# :result])
+         nil)))
 
 (defn generate-stateful-mock
   "generates a mock given a mock-data object of the form
