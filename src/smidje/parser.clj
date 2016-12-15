@@ -26,7 +26,7 @@
   (let [call-form (nth forms 0)
         arrow (nth forms 1)
         expected-form (nth forms 2)]
-    (merge 
+    (merge
     {:call-form            call-form
      :arrow                arrow
      :expected-result      expected-form
@@ -38,6 +38,10 @@
   [form]
   (or (= form '=>)
       (= form '=not=>)))
+
+(defn throws-form?
+  [form]
+  (= (first form) 'throws))
 
 (defn parse
   [forms]
