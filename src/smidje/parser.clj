@@ -24,7 +24,7 @@
   [fn1 fn2]
   (symbol (str ".." (gensym (str fn1 "->" fn2)) ".." ))) 
 
-(defn- flatten-provided
+(defn- unnest-provided
   [provided]
   (let [match (first provided)]
     (if (some list? match)
