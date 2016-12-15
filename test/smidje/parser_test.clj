@@ -18,7 +18,6 @@
 (m/fact "simple addition unequal"
         (parser/parse simple-addition-unequal-fact) => [im/simple-addtion-not-assertion])
 
-;.;. Ding! You Have Gained Experience -- @zspencer
 (m/fact "validator recognizes right hand expected exception"
   (throws-form? '(throws)) => true
   (throws-form? '(throws Exception)) => true
