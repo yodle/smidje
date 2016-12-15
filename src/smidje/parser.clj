@@ -5,6 +5,7 @@
 (declare generate)
 
 (def provided "provided")
+(def throws "throws")
 
 (defn- provided-form?
   [form]
@@ -23,12 +24,15 @@
 
 (defn throws-form?
   [form]
-  (= (first form) 'throws))
+  (and (seq? form)
+       (= (first form) 'throws)))
 
 (defn- parse-expected
   [form]
   (if (throws-form? form)
     (merge
+      ; TODO: validate that second argument is an exception type
+      ; TODO: validate optional third argument is a string
       {:throws-exception (second form)}
       (when (> (count form) 2)
         {:throws-message (nth form 2)}))
@@ -81,5 +85,7 @@
   (macroexpand
     '(fact "what a fact"
            (+ 1 1) => 2
-           (+ 2 2) =not=> 3))
+           (+ 2 2) =not=> 3
+           (/ 2 0) => (throws ArithmeticException)
+           (/ 4 0) => (throws ArithmeticException "Divide by zero")))
 )
