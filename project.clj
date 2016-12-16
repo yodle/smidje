@@ -1,6 +1,8 @@
-(defproject smidje "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+(defn ver [] (-> "smidje.version" slurp .trim))
+
+(defproject smidje (ver)
+  :description "A little library for cljs testing and mocking inspired by Midje"
+  :url "https://github.com/munk/smidje"
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]]
