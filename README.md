@@ -8,11 +8,13 @@ A little library for cljs testing and mocking
 
 ## Usage
 
-FIXME
+With Leiningen
+
+[smidje "0.1.0-SNAPSHOT"]
 
 ## License
 
-Copyright © 2016 FIXME
+Copyright © 2016 SmidjeCo (A Hackdown Company)
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
