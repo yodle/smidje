@@ -1,4 +1,4 @@
-(defn ver [] (-> "../smidje.version" slurp .trim))
+(defn ver [] (-> "smidje.version" slurp .trim))
 
 (defproject smidje (ver)
   :description "A little library for cljs testing and mocking inspired by Midje"
