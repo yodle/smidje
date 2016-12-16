@@ -1,4 +1,6 @@
-(defproject smidje "0.1.108"
+(defn ver [] (-> "../smidje.version" slurp .trim))
+
+(defproject smidje (ver)
   :description "A little library for cljs testing and mocking inspired by Midje"
   :url "https://github.com/munk/smidje"
   :license {:name "Eclipse Public License"
