@@ -12,7 +12,7 @@ With Leiningen
 
 [smidje "0.1.108"]
 
-You can find more detail about Smidje syntax on our [wiki](https://github.com/munk/smidje/wiki/Tutorial).
+You can find more detail about smidje syntax on our [wiki](https://github.com/munk/smidje/wiki/Tutorial).
 
 ## Contributors
 
