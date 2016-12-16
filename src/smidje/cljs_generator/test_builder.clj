@@ -20,14 +20,26 @@
 (defn generate-mock-bindings [provided mocks-atom]
   (into [] (reduce conj (map (generate-mock-binding mocks-atom) provided))))
 
+(defn generate-mock-map [provided]
+  (reduce
+    (fn[current-map addition]
+      (let [{mock-config :return
+             function    :mock-function} addition
+             function-key (str function)]
+        (merge current-map {function-key {:mock-config mock-config
+                                          :function function}})) )
+    {}
+    provided))
+
 (defn generate-assertion [assertion]
       (let [{test-function#   :call-form
              expected-result# :expected-result
              arrow#           :arrow
              provided#        :provided} assertion
+             mock-map#        (generate-mock-map provided#)
              mocks-atom       (gensym)]
-           `(cljs.core/let [~mocks-atom (cljs.core/atom ~provided#)]
-              (cljs.core/with-redefs ~(generate-mock-bindings provided# mocks-atom)
+           `(cljs.core/let [~mocks-atom (cljs.core/atom ~mock-map#)]
+              (cljs.core/with-redefs ~(generate-mock-bindings mock-map# mocks-atom)
                                    (cljs.test/is (~(do-arrow arrow#) ~test-function# ~expected-result#))))))
 
 (defn generate-test [test-definition]
