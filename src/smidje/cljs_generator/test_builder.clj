@@ -24,7 +24,7 @@
        [function mock-function])))
 
 (defn generate-mock-bindings [provided mocks-atom]
-  (into [] (reduce conj (map (generate-mock-binding mocks-atom) provided))))
+  (into [] (reduce concat (map (generate-mock-binding mocks-atom) provided))))
 
 (defn generate-mock-map [provided]
   (reduce
