@@ -34,6 +34,11 @@
    :provided {:mock-function 'foo
               :return provided-mock-config}})
 
+(def expected-exception-assertion
+  {:call-form '(foo nil)
+   :arrow '=>
+   :throws-exception 'InvalidFooError})
+
 (defn expect-match-map [name & assertions]
   (merge
    test-metadata

@@ -1,6 +1,12 @@
 (ns smidje.cljs-generator.test-builder
     (:require [smidje.arrows :refer [arrow-set]]
-              [smidje.cljs-generator.mocks :refer [generate-stateful-mock]]))
+              [smidje.cljs-generator.mocks :refer [generate-mock-function]]))
+
+(defmulti generate-right-hand
+  (fn [assertion]
+    (if (:throws-exception assertion)
+      :generate-expected-exception
+      :generate-assertion)))
 
 (defn do-arrow [arrow]
       (cond
@@ -12,18 +18,24 @@
                                          arrow-set)))))
 
 (defn generate-mock-binding [mocks-atom]
-  (let [mock-config-var (gensym "mock-config")
-        function-name-var (gensym "function-name")
-        mock-var (gensym "mock")]
-  `(cljs.core/fn [mock-data-map#]
-     (cljs.core/let [{~mock-config-var :return
-                     ~function-name-var :mock-function} mock-data-map#
-                     ~mock-var ~(generate-stateful-mock mock-config-var)]
-       (cljs.core/swap! ~mocks-atom #(cljs.core/conj % (:mock-state-atom ~mock-var)))
-       [~function-name-var (:mock-function ~mock-var)]))))
+  (fn [mock-data-map]
+     (let [[function-key {function :function}] mock-data-map
+           mock-function (generate-mock-function function-key mocks-atom)]
+       [function mock-function])))
 
 (defn generate-mock-bindings [provided mocks-atom]
-  `(doall (cljs.core/into [] (cljs.core/reduce cljs.core/conj (cljs.core/map ~(generate-mock-binding mocks-atom) ~provided)))))
+  (into [] (reduce conj (map (generate-mock-binding mocks-atom) provided))))
+
+(defn generate-mock-map [provided]
+  (reduce
+    (fn[current-map addition]
+      (let [{mock-config :return
+             function    :mock-function} addition
+             function-key (str function)]
+        (merge current-map {function-key {:mock-config mock-config
+                                          :function function}})) )
+    {}
+    provided))
 
 (defn generate-single-assert [assertion]
   (let [{arrow#           :arrow
@@ -32,17 +44,23 @@
     `(cljs.test/is (~(do-arrow arrow#) ~test-function# ~expected-result#))))
 
 (defn generate-assertion [assertion]
-      (let [{provided#  :provided} assertion
-             mocks-atom (gensym)]
-           `(cljs.core/let [~mocks-atom (cljs.core/atom [])]
-              (cljs.core/with-redefs ~(generate-mock-bindings provided# mocks-atom)
-                ~(generate-single-assert assertion)))))
+  (let [{provided#  :provided} assertion
+        mock-map#  (generate-mock-map provided#)
+        mocks-atom (gensym)]
+    `(cljs.core/let [~mocks-atom (cljs.core/atom ~mock-map#)]
+                    (cljs.core/with-redefs ~(generate-mock-bindings mock-map# mocks-atom)
+                      ~(generate-single-assert assertion)))))
+
+(defn generate-expected-exception [exception-definition]
+  (let [expected-exception (:throws-exception exception-definition)
+        call-form (:call-form exception-definition)]
+    `(cljs.test/is (cljs.test/thrown? ~(symbol expected-exception) ~call-form))))
 
 (defn generate-test [test-definition]
   (let [assertions# (:assertions test-definition)
         name#       (:name test-definition)]
     `(cljs.test/deftest ~(symbol name#)
-       ~@(map generate-assertion assertions#))))
+       ~@(map generate-right-hand assertions#))))
 
 (defn generate-tests [test-runtime]
   (let [tests# (:tests test-runtime)]
@@ -50,3 +68,11 @@
 
 (defmacro testmacro [test-runtime]
   (generate-tests test-runtime))
+
+(defmethod generate-right-hand :generate-assertion
+  [assertion]
+  (generate-assertion assertion))
+
+(defmethod generate-right-hand :generate-expected-exception
+  [assertion]
+  (generate-expected-exception assertion))
