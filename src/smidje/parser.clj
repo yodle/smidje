@@ -177,7 +177,7 @@
                 _ (println "fact-table-values" fact-table-values)                    ; (1 2 3 3 4 7 9 10 19)
                 facts (gen-facts fact-template fact-table-binding fact-table-values)
                 _ (println "facts" facts)]
-               `(fact ~fact-name ~@facts)))
+               (concat `(fact ~fact-name) (apply concat facts))))
 
 (defmacro fact
   [& _]
