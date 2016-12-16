@@ -12,6 +12,8 @@ With Leiningen
 
 [smidje "0.1.0-SNAPSHOT"]
 
+You can find more detail about Smidje syntax on our [wiki](https://github.com/munk/smidje/wiki/Tutorial).
+
 ## Contributors
 
 @BrianEdwards85
