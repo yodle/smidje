@@ -54,7 +54,7 @@
 (defn generate-expected-exception [exception-definition]
   (let [expected-exception (:throws-exception exception-definition)
         call-form (:call-form exception-definition)]
-    `(cljs.test/is (cljs.test/thrown? ~(symbol expected-exception) ~call-form))))
+    `(cljs.test/is (~'thrown? ~(symbol expected-exception) ~call-form))))
 
 (defn generate-test [test-definition]
   (let [assertions# (:assertions test-definition)
