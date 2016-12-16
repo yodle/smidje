@@ -1,6 +1,6 @@
 (defproject smidje "0.1.108"
   :description "A little library for cljs testing and mocking inspired by Midje"
-  :url "https://github.com/munk/smidje"
+  :url "https://github.com/yodle/smidje"
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]]

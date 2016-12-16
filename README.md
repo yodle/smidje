@@ -12,22 +12,29 @@ With Leiningen
 
 [smidje "0.1.108"]
 
-You can find more detail about Smidje syntax on our [wiki](https://github.com/munk/smidje/wiki/Tutorial).
+You can find more detail about Smidje syntax on our [wiki](https://github.com/yodlet/smidje/wiki/Tutorial).
 
 ## Contributors
 
-@BrianEdwards85
-@wrenndering
-@dustinvogt
-@Luckvery
-@CryptoRAT
-@djljr
-@ragnorak1000
-@munk
+- @BrianEdwards85
+
+- @wrenndering
+
+- @dustinvogt
+
+- @Luckvery
+
+- @CryptoRAT
+
+- @djljr
+
+- @ragnorak1000
+
+- @munk
 
 ## License
 
-Copyright © 2016 SmidjeCo (A Hackdown Company)
+Copyright © 2016 Yodle
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
