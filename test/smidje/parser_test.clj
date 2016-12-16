@@ -52,5 +52,22 @@
             (m/provided (gensym "a->b") m/=> 'a->b01 (gensym "b->c") m/=> 'b->c02))
 
 (m/fact "seperate-provided-forms"
-        (#'smidje.parser/seperate-provided-forms simple-addition-fact) => [simple-addition-fact])
+        (#'smidje.parser/seperate-provided-forms simple-addition-fact) => [simple-addition-fact]
+        (set  (#'smidje.parser/seperate-provided-forms
+               '((+ 1 1) => 2 :times 1 (* 2 3) => 6 :times 2 :except 3 (/ 4 2) => 2))) => '#{((+ 1 1) => 2 :times 1)
+                                                                                      ((/ 4 2) => 2)
+                                                                                     ((* 2 3) => 6 :times 2 :except 3)})
+
+(m/fact "build-provided-map"
+        (#'smidje.parser/build-provided-map simple-addition-fact) => {:mock-function '+
+                                                                      :paramaters '(1 1)
+                                                                      :arrow '=>
+                                                                      :result 2}
+        (#'smidje.parser/build-provided-map '((add 2 3) => 5 :times 1 :except 4)) => {:mock-function 'add
+                                                                                      :paramaters '(2 3)
+                                                                                      :arrow '=>
+                                                                                      :result 5
+                                                                                      :times 1
+                                                                                      :except 4}) 
+
 
