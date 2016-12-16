@@ -1,5 +1,5 @@
 (ns smidje.parser
-  (:require [smidje.arrows :refer :all]
+  (:require [smidje.arrows :refer [arrow-set]]
             [smidje.cljs-generator.test-builder :as cljsbuilder]))
 
 (declare generate)
@@ -71,7 +71,7 @@
   (merge
    (apply hash-map (drop 3 provided)) 
    {:mock-function (first (first provided))
-    :paramaters (rest (first provided))
+    :paramaters (into [] (rest (first provided)))
     :arrow (second provided)
     :result (nth provided 2)
     }))
