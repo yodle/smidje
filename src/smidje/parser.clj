@@ -7,7 +7,7 @@
 (def provided "provided")
 (def throws "throws")
 
-(defn- provided-form?
+(defn- ^{:testable true} provided-form?
   [form]
   (and (seq? form)
        (= (first form) 'provided)))
