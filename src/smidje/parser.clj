@@ -74,23 +74,12 @@
               target-form)))
 
 (defn swap-symbol-for-value [fact-template-group symbol-value-map]
-      (println "(prewalk-demo fact-template-group)" (prewalk-demo fact-template-group))
+
       (println "(stringify-keys symbol-value-map)" (stringify-keys symbol-value-map))
       (println "(keys (stringify-keys symbol-value-map)" (keys (stringify-keys symbol-value-map)))
       (prewalk (fn [expr]
 
                    (let [
-                         _ (println "expr" expr)
-                         _ (println "str expr" expr)
-                         _ (println "2 (first (str expr))" (first (str expr)))
-                         _ (println "3 (symbol? expr)" (symbol? expr))
-                         _ (println "4 (stringify-keys symbol-value-map)" (stringify-keys symbol-value-map))
-                         _ (println "5 (keys (stringify-keys symbol-value-map)" (keys (stringify-keys symbol-value-map)))
-                         _ (println "6 (type ofkeys (stringify-keys symbol-value-map)" (type (first (keys (stringify-keys symbol-value-map)))))
-                         _ (println "7 (and (symbol? expr) (.contains (keys (stringify-keys symbol-value-map)) (str expr)))"
-                                    (and (= \? (first (str expr))) (symbol? expr) (contains?   symbol-value-map  expr)))
-                         _ (println "8 (contains?  (stringify-keys symbol-value-map) (str expr))" (contains?  symbol-value-map expr))
-
                          ]
                         (if (and (= \? (first (str expr)))
                                  (symbol? expr)
@@ -188,7 +177,7 @@
                 _ (println "fact-table-values" fact-table-values)                    ; (1 2 3 3 4 7 9 10 19)
                 facts (gen-facts fact-template fact-table-binding fact-table-values)
                 _ (println "facts" facts)]
-               `(fact fact-name ~@facts)))
+               `(fact ~fact-name ~@facts)))
 
 (defmacro fact
   [& _]
