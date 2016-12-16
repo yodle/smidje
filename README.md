@@ -1,6 +1,6 @@
 # smidje
 
-A little library for cljs testing and mocking
+A little library for cljs testing and mocking inspired by [Midje](https://github.com/marick/Midje)
 
 ## Build Status
 
@@ -11,6 +11,17 @@ A little library for cljs testing and mocking
 With Leiningen
 
 [smidje "0.1.0-SNAPSHOT"]
+
+## Contributors
+
+@BrianEdwards85
+@wrenndering
+@dustinvogt
+@Luckvery
+@CryptoRAT
+@djljr
+@ragnorak1000
+@munk
 
 ## License
 
