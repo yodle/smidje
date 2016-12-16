@@ -25,15 +25,18 @@
 (defn generate-mock-bindings [provided mocks-atom]
   `(doall (cljs.core/into [] (cljs.core/reduce cljs.core/conj (cljs.core/map ~(generate-mock-binding mocks-atom) ~provided)))))
 
+(defn generate-single-assert [assertion]
+  (let [{arrow#           :arrow
+         test-function#   :call-form
+         expected-result# :expected-result} assertion]
+    `(cljs.test/is (~(do-arrow arrow#) ~test-function# ~expected-result#))))
+
 (defn generate-assertion [assertion]
-      (let [{test-function#   :call-form
-             expected-result# :expected-result
-             arrow#           :arrow
-             provided#        :provided} assertion
-             mocks-atom       (gensym)]
+      (let [{provided#  :provided} assertion
+             mocks-atom (gensym)]
            `(cljs.core/let [~mocks-atom (cljs.core/atom [])]
               (cljs.core/with-redefs ~(generate-mock-bindings provided# mocks-atom)
-                                   (cljs.test/is (~(do-arrow arrow#) ~test-function# ~expected-result#))))))
+                ~(generate-single-assert assertion)))))
 
 (defn generate-test [test-definition]
   (let [assertions# (:assertions test-definition)
