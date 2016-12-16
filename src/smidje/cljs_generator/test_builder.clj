@@ -2,6 +2,12 @@
     (:require [smidje.arrows :refer [arrow-set]]
               [smidje.cljs-generator.mocks :refer [generate-mock-function]]))
 
+(defmulti generate-right-hand
+  (fn [assertion]
+    (if (:throws-exception assertion)
+      :generate-expected-exception
+      :generate-assertion)))
+
 (defn do-arrow [arrow]
       (cond
         (= arrow '=>) 'cljs.core/=
@@ -42,11 +48,16 @@
               (cljs.core/with-redefs ~(generate-mock-bindings mock-map# mocks-atom)
                                    (cljs.test/is (~(do-arrow arrow#) ~test-function# ~expected-result#))))))
 
+(defn generate-expected-exception [exception-definition]
+  (let [expected-exception (:throws-exception exception-definition)
+        call-form (:call-form exception-definition)]
+    `(cljs.test/is (cljs.test/thrown? ~(symbol expected-exception) ~call-form))))
+
 (defn generate-test [test-definition]
   (let [assertions# (:assertions test-definition)
         name#       (:name test-definition)]
     `(cljs.test/deftest ~(symbol name#)
-       ~@(map generate-assertion assertions#))))
+       ~@(map generate-right-hand assertions#))))
 
 (defn generate-tests [test-runtime]
   (let [tests# (:tests test-runtime)]
@@ -54,3 +65,13 @@
 
 (defmacro testmacro [test-runtime]
   (generate-tests test-runtime))
+
+
+
+(defmethod generate-right-hand :generate-assertion
+  [assertion]
+  (generate-assertion assertion))
+
+(defmethod generate-right-hand :generate-expected-exception
+  [assertion]
+  (generate-expected-exception assertion))
