@@ -13,7 +13,7 @@
 
 (fact "simple throws"
       (generate-expected-exception im/expected-exception-assertion)
-      => '(cljs.test/is (cljs.test/thrown? InvalidFooError (foo nil))))
+      => '(cljs.test/is (thrown? InvalidFooError (foo nil))))
 
 (tabular
  (fact "arrows generate correct equality checks"
