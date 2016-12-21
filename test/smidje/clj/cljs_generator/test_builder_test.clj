@@ -1,6 +1,6 @@
-(ns smidje.cljs-generator.test-builder-test
+(ns smidje.clj.cljs-generator.test-builder-test
   (:require [midje.sweet :refer :all]
-            [smidje.intermediate-maps :as im]
+            [smidje.clj.parser.intermediate-maps :as im]
             [smidje.cljs-generator.test-builder :refer :all]))
 
 (fact "a single expect match arrow fact"
