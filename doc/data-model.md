@@ -26,7 +26,7 @@ the map into cljs-test syntax.
 `:name`- The name of a single fact.  
 `:assertions`- A vector of assertions which are individual arrow statements for example `(+ 1 1) => 2`  
 `:function-under-test`- Quoted form of the function under test (the left side of the arrow)  
-`call-form`- The unquoted function under test  
+`:call-form`- The unquoted function under test  
 `:position`- The line number of the arrow statement  
 `:expected-result-form`- Quoted form of the expected result (right hand side of the arrow)  
 `:expected-result`- Evaluated result of the expected value  
