@@ -1,6 +1,6 @@
 (ns smidje.cljs-generator.test-builder
     (:require [smidje.parser.arrows :refer [arrow-set]]
-              [smidje.parser.checkers :refer :all]
+              [smidje.parser.checkers :refer [truthy falsey TRUTHY FALSEY truth-set]]
               [smidje.cljs-generator.mocks :refer [generate-mock-function]]))
 
 (defn do-arrow [arrow]

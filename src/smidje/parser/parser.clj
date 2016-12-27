@@ -1,8 +1,10 @@
 (ns smidje.parser.parser
   (:require [smidje.parser.arrows :refer [arrow-set]]
-            [smidje.parser.checkers :refer :all]))
+            [smidje.parser.checkers :refer [throws truthy TRUTHY falsey FALSEY]]))
 
 (declare generate)
+
+(def provided "provided")
 
 (defn- is-arrow
   [form]
