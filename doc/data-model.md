@@ -21,7 +21,7 @@ the map into cljs-test syntax.
                                                               :calls ""
                                                               :arrow ""}}}]}]}]}
 ``` 
-`:namespace`- The namespace of the fact.  
+`:name-space`- The namespace of the fact.  
 `:tests`- A vector of facts (this will be used for nesting which is not supported yet).  
 `:name`- The name of a single fact.  
 `:assertions`- A vector of assertions which are individual arrow statements for example `(+ 1 1) => 2`  
