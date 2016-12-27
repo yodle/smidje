@@ -1,4 +1,4 @@
-(ns smidje.intermediate-maps)
+(ns smidje.clj.parser.intermediate-maps)
 
 (def test-metadata
   {:smidje/namespace 'smidje.core-test

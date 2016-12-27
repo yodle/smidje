@@ -1,6 +1,5 @@
-(ns smidje.parser
-  (:require [smidje.arrows :refer [arrow-set]]
-            [smidje.cljs-generator.test-builder :as cljsbuilder]))
+(ns smidje.parser.parser
+  (:require [smidje.parser.arrows :refer [arrow-set]]))
 
 (declare generate)
 
@@ -131,18 +130,14 @@
       (recur (conj result (parse-equals input)) (drop (if (has-provided-form? input) 4 3 ) input))
       result)))
 
-(defmacro fact
-  [& _]
-  (let [name (if (string? (second &form))
-               (clojure.string/replace (second &form) #"[^\w\d]+" "-")
-               (second &form))
-        fact-forms (drop 2 &form)]
+(defn parse-fact
+  [form]
+  (let [name (if (string? (second form))
+               (clojure.string/replace (second form) #"[^\w\d]+" "-")
+               (second form))
+        fact-forms (drop 2 form)]
     (-> {:tests [{:name name
-         :assertions (parse fact-forms)}]}
-        (generate))))
-
-(defn generate [testmap]
-  (cljsbuilder/generate-tests testmap))
+         :assertions (parse fact-forms)}]})))
 
 (comment
   (macroexpand

@@ -1,5 +1,5 @@
 (ns smidje.cljs-generator.test-builder
-    (:require [smidje.arrows :refer [arrow-set]]
+    (:require [smidje.parser.arrows :refer [arrow-set]]
               [smidje.cljs-generator.mocks :refer [generate-mock-function]]))
 
 (defmulti generate-right-hand
