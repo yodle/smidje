@@ -6,7 +6,7 @@ to build out a cljs compatible test. Currently the only supported generator is t
 the map into cljs-test syntax.
 
 ```clojure
-{:name-space ""
+{:namespace ""
  :tests [{
             :name ""
             :assertions [{
@@ -21,7 +21,7 @@ the map into cljs-test syntax.
                                                               :calls ""
                                                               :arrow ""}}}]}]}]}
 ``` 
-`:name-space`- The namespace of the fact.  
+`:namespace`- The namespace of the fact.  
 `:tests`- A vector of facts (this will be used for nesting which is not supported yet).  
 `:name`- The name of a single fact.  
 `:assertions`- A vector of assertions which are individual arrow statements for example `(+ 1 1) => 2`  
