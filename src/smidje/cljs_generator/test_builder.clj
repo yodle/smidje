@@ -1,12 +1,7 @@
 (ns smidje.cljs-generator.test-builder
     (:require [smidje.parser.arrows :refer [arrow-set]]
+              [smidje.parser.checkers :refer :all]
               [smidje.cljs-generator.mocks :refer [generate-mock-function]]))
-
-(defmulti generate-right-hand
-  (fn [assertion]
-    (if (:throws-exception assertion)
-      :generate-expected-exception
-      :generate-assertion)))
 
 (defn do-arrow [arrow]
       (cond
@@ -16,6 +11,15 @@
         :else (throw (Exception. (format "Unknown arrow given: %s | Valid arrows: %s"
                                          arrow
                                          arrow-set)))))
+
+(defn do-truth-test [form]
+  (cond
+    (= form 'truthy) true
+    (= form 'TRUTHY) true
+    (= form 'falsey) false
+    (= form 'FALSEY) false
+    :else (throw (Exception. (format "Unknown truth testing expression: %s | Valid expressions: %s"
+                                     form truth-set)))))
 
 (defn generate-mock-binding [mocks-atom]
   (fn [mock-data-map]
@@ -51,10 +55,22 @@
                     (cljs.core/with-redefs ~(generate-mock-bindings mock-map# mocks-atom)
                       ~(generate-single-assert assertion)))))
 
+(defn generate-truth-test [truth-test-definition]
+  (let [truth-type# (:truth-testing truth-test-definition)
+        test-function# (:call-form truth-test-definition)]
+    `(cljs.test/is (= (boolean ~test-function#) ~(do-truth-test truth-type#)))))
+
 (defn generate-expected-exception [exception-definition]
   (let [expected-exception (:throws-exception exception-definition)
         call-form (:call-form exception-definition)]
     `(cljs.test/is (~'thrown? ~(symbol expected-exception) ~call-form))))
+
+(defn generate-right-hand
+  [assertion]
+  (cond
+    (:truth-testing assertion) (generate-truth-test assertion)
+    (:throws-exception assertion) (generate-expected-exception assertion)
+    :else (generate-assertion assertion)))
 
 (defn generate-test [test-definition]
   (let [assertions# (:assertions test-definition)
@@ -69,10 +85,3 @@
 (defmacro testmacro [test-runtime]
   (generate-tests test-runtime))
 
-(defmethod generate-right-hand :generate-assertion
-  [assertion]
-  (generate-assertion assertion))
-
-(defmethod generate-right-hand :generate-expected-exception
-  [assertion]
-  (generate-expected-exception assertion))

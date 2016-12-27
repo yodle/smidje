@@ -24,5 +24,14 @@
   (+ 1 3) =not=> 2
   (+ 1 3) =not> 2)
 
+(fact "truthy and falsey"
+  true => truthy
+  true => TRUTHY
+  false => falsey
+  false => FALSEY
+  nil => falsey
+  1 => truthy
+  "text" => truthy)
+
 (fact "expects exception"
   (throw (js/Error. "oh no!")) => (throws js/Error))

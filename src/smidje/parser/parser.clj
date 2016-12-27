@@ -1,5 +1,6 @@
 (ns smidje.parser.parser
-  (:require [smidje.parser.arrows :refer [arrow-set]]))
+  (:require [smidje.parser.arrows :refer [arrow-set]]
+            [smidje.parser.checkers :refer :all]))
 
 (declare generate)
 
@@ -7,9 +8,6 @@
   [form]
   (or (= form '=>)
       (= form '=not=>)))
-
-(def provided "provided")
-(def throws "throws")
 
 (defn- ^{:testable true} provided-form?
   [form]
@@ -89,21 +87,34 @@
     }
     {}))
 
+(defn- truth-testing-form? [input]
+  (and (not (seq? input))
+       (boolean (some #(= input %) ['truthy 'TRUTHY 'falsey 'FALSEY]))))
+
 (defn throws-form?
   [form]
   (and (seq? form)
        (= (first form) 'throws)))
 
+(defn- parse-truth-testing
+  [form]
+  {:truth-testing form})
+
+(defn- parse-throws
+  [form]
+  (merge
+    ; TODO: validate that second argument is an exception type
+    ; TODO: validate optional third argument is a string
+    {:throws-exception (second form)}
+    (when (> (count form) 2)
+      {:throws-message (nth form 2)})))
+
 (defn- parse-expected
   [form]
-  (if (throws-form? form)
-    (merge
-      ; TODO: validate that second argument is an exception type
-      ; TODO: validate optional third argument is a string
-      {:throws-exception (second form)}
-      (when (> (count form) 2)
-        {:throws-message (nth form 2)}))
-    {:expected-result form}))
+  (cond
+    (truth-testing-form? form) (parse-truth-testing form)
+    (throws-form? form) (parse-throws form)
+    :else {:expected-result form}))
 
 (defn- parse-equals
   [forms]
@@ -139,11 +150,3 @@
     (-> {:tests [{:name name
          :assertions (parse fact-forms)}]})))
 
-(comment
-  (macroexpand
-    '(fact "what a fact"
-           (+ 1 1) => 2
-           (+ 2 2) =not=> 3
-           (/ 2 0) => (throws ArithmeticException)
-           (/ 4 0) => (throws ArithmeticException "Divide by zero")))
-)
