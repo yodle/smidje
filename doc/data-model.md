@@ -16,6 +16,9 @@ the map into cljs-test syntax.
                             :expected-result-form ""
                             :expected-result ""
                             :arrow ""
+                            :throws-exception ""
+                            :throws-message ""
+                            :truth-testing ""
                             :provided [{:mock-function ()
                                         :return {'(<params>) {:result [...] ;list of results to support =stream=>
                                                               :calls ""
@@ -31,6 +34,9 @@ the map into cljs-test syntax.
 `:expected-result-form`- Quoted form of the expected result (right hand side of the arrow)  
 `:expected-result`- Evaluated result of the expected value  
 `:arrow`- The arrow that is being used (=>, =not=>, etc)  
+`:throws-exception`- Present when testing an exception is thrown, indicates the exception type  
+`:throws-message`- Optionally present when testing an exception, indicates the thrown exception message  
+`:truth-testing`- Present when testing truthiness, indicates the desired truthiness checker  
 `:provided`- A vector of maps representing mocks  
 `:mock-function`- The function to mock  
 `:return`- a map of parameters that will be passed to :mock-function and the corresponding value to be returned  
