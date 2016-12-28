@@ -1,10 +1,9 @@
-(ns smidje.parser
-  (:require [smidje.arrows :refer [arrow-set]]
+(ns smidje.parser.parser
+  (:require [smidje.parser.arrows :refer [arrow-set]]
             [smidje.cljs-generator.test-builder :as cljsbuilder]
-            [clojure.walk :refer [prewalk prewalk-demo stringify-keys]]))
+            [clojure.walk :refer [prewalk]]))
 
 (declare generate)
-(declare fact)
 
 (defn- is-arrow
   [form]
@@ -148,7 +147,7 @@
               (clojure.string/replace target-form #"[^\w\d]+" "-")
               target-form)))
 
-(defmacro tabular
+(defn tabular*
   "Creates tests from a table of example cases
 
    (tabular \"test-name\"
@@ -157,8 +156,8 @@
      ?a ?b ?c
      1  1  2
      2  3  5)"
-  [& _]
-  (let [[macro test-name & table-forms] &form]
+  [form]
+  (let [[macro test-name & table-forms] form]
     (let [[fact & table] table-forms
           [fact-macro fact-name & fact-form] fact
           full-name (str test-name " : " fact-name)
@@ -173,36 +172,13 @@
                               expr)))
                         binding-maps)
           substituted-facts (map prewalk walk-fns (repeat fact-form))]
-      (concat `(fact ~full-name) (apply concat substituted-facts)))))
+      (concat `(smidje.core/fact ~full-name) (apply concat substituted-facts)))))
 
-(defmacro fact
-  [& _]
-    ; TODO: Cover case for fact with no name
-    ; TODO: Cover case for nested fact/tabular
-  (let [name (macro-name &form)
-        fact-forms (drop 2 &form)]
+(defn parse-fact
+  [form]
+  (let [name (if (string? (second form))
+               (clojure.string/replace (second form) #"[^\w\d]+" "-")
+               (second form))
+        fact-forms (drop 2 form)]
     (-> {:tests [{:name name
-         :assertions (parse fact-forms)}]}
-        (generate))))
-
-(defn generate [testmap]
-  (cljsbuilder/generate-tests testmap))
-
-
-  (comment
-    (macroexpand
-      '(fact "what a fact"
-             (+ 1 1) => 2
-             (+ 2 2) =not=> 3
-             (/ 2 0) => (throws ArithmeticException)
-             (/ 4 0) => (throws ArithmeticException "Divide by zero")))
-
-    (macroexpand-1
-     '(tabular "test name"
-               (fact "fact name"
-                     (+ ?a ?b) => ?c)
-               ?a ?b ?c
-               1  2  3
-               3  4  7))
-
-    )
+         :assertions (parse fact-forms)}]})))

@@ -1,4 +1,4 @@
-(ns smidje.arrows)
+(ns smidje.parser.arrows)
 
 (def => "=>")
 

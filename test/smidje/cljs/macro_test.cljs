@@ -1,7 +1,9 @@
 (ns smidje.cljs.macro-test
   (:require-macros [cljs.test :refer [deftest is]]
-                   [smidje.parser :refer [fact tabular]]
-                   [smidje.cljs-generator.test-builder :refer [testmacro]]))
+                   [smidje.core :refer [fact tabular]]))
+
+(enable-console-print!)
+
 (defn bar []
   1)
 

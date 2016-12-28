@@ -12,7 +12,7 @@ With Leiningen
 
 [smidje "0.1.108"]
 
-You can find more detail about Smidje syntax on our [wiki](https://github.com/munk/smidje/wiki/Tutorial).
+You can find more detail about smidje syntax on our [wiki](https://github.com/munk/smidje/wiki/Tutorial).
 
 ## Contributors
 
@@ -27,7 +27,7 @@ You can find more detail about Smidje syntax on our [wiki](https://github.com/mu
 
 ## License
 
-Copyright © 2016 SmidjeCo (A Hackdown Company)
+Copyright © 2016 Yodle, Inc
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
