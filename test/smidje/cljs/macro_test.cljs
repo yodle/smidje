@@ -39,4 +39,4 @@
 (fact "even is even"
       2 => even?
       3 =not=> even?
-      (+ 3 2)=> 5)
+      (+ 3 2) => #(= 5 %))
