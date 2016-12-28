@@ -29,5 +29,4 @@
 (m/fact "provided validator recognizes provided forms correctly"
         (provided-form? '(provided)) => true                ; recognizes provided form
         (provided-form? '(normal-return-path)) => false     ; does not recognize other forms as provided
-        (provided-form? 2) => false                         ; does not recognize non-forms as provided form
-        )
+        (provided-form? 2) => false)                        ; does not recognize non-forms as provided form
