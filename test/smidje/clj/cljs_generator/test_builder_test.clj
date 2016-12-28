@@ -5,11 +5,15 @@
 
 (fact "a single expect match arrow fact"
       (generate-single-assert im/simple-addition-assertion)
-      => `(cljs.test/is (cljs.core/= (~'+ 1 1) 2)))
+      => `(cljs.core/cond
+            (cljs.core/fn? 2) (cljs.test/is (cljs.core/= (2 (~'+ 1 1)) true))
+            :else (cljs.test/is (cljs.core/= (~'+ 1 1) 2))))
 
 (fact "a single not assertion fact"
       (generate-single-assert im/simple-addtion-not-assertion)
-      => `(cljs.test/is (cljs.core/not= (~'+ 1 1) 3)))
+      => `(cljs.core/cond
+            (cljs.core/fn? 3) (cljs.test/is (cljs.core/not= (3 (~'+ 1 1)) true))
+            :else (cljs.test/is (cljs.core/not= (~'+ 1 1) 3))))
 
 (fact "simple throws"
       (generate-expected-exception im/expected-exception-assertion)
@@ -21,5 +25,4 @@
  ?arrow     ?expected
  '=>        'cljs.core/=
  '=not=>    'cljs.core/not=
- '=not>     'cljs.core/not=
  '=bogus=>  (throws Exception))
