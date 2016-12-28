@@ -6,7 +6,6 @@
 (defn do-arrow [arrow]
       (cond
         (= arrow '=>) 'cljs.core/=
-        (= arrow '=not>) 'cljs.core/not=
         (= arrow '=not=>) 'cljs.core/not=
         :else (throw (Exception. (format "Unknown arrow given: %s | Valid arrows: %s"
                                          arrow
@@ -45,7 +44,9 @@
   (let [{arrow#           :arrow
          test-function#   :call-form
          expected-result# :expected-result} assertion]
-    `(cljs.test/is (~(do-arrow arrow#) ~test-function# ~expected-result#))))
+    `(cljs.core/cond
+       (cljs.core/fn? ~expected-result#) (cljs.test/is (~(do-arrow arrow#) (~expected-result# ~test-function#) true))
+       :else (cljs.test/is (~(do-arrow arrow#) ~test-function# ~expected-result#)))))
 
 (defn generate-assertion [assertion]
   (let [{provided#  :provided} assertion
@@ -81,7 +82,3 @@
 (defn generate-tests [test-runtime]
   (let [tests# (:tests test-runtime)]
      `(do ~@(map generate-test tests#))))
-
-(defmacro testmacro [test-runtime]
-  (generate-tests test-runtime))
-
