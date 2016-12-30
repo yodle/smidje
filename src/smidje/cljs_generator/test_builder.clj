@@ -48,14 +48,6 @@
        (cljs.core/fn? ~expected-result#) (cljs.test/is (~(do-arrow arrow#) (~expected-result# ~test-function#) true))
        :else (cljs.test/is (~(do-arrow arrow#) ~test-function# ~expected-result#)))))
 
-(defn generate-assertion [assertion]
-  (let [{provided#  :provided} assertion
-        mock-map#  (generate-mock-map provided#)
-        mocks-atom (gensym)]
-    `(cljs.core/let [~mocks-atom (cljs.core/atom ~mock-map#)]
-                    (cljs.core/with-redefs ~(generate-mock-bindings mock-map# mocks-atom)
-                      ~(generate-single-assert assertion)))))
-
 (defn generate-truth-test [truth-test-definition]
   (let [truth-type# (:truth-testing truth-test-definition)
         test-function# (:call-form truth-test-definition)]
@@ -66,18 +58,31 @@
         call-form (:call-form exception-definition)]
     `(cljs.test/is (~'thrown? ~(symbol expected-exception) ~call-form))))
 
-(defn generate-right-hand
+(defn generate-assertion
   [assertion]
   (cond
     (:truth-testing assertion) (generate-truth-test assertion)
     (:throws-exception assertion) (generate-expected-exception assertion)
-    :else (generate-assertion assertion)))
+    :else (generate-single-assert assertion)))
+
+(defn generate-mock-validation [mocks-atom-name]
+  `((map ~validate-mock (cljs.core/vals (cljs.core/deref ~mocks-atom-name)))
+     (cljs.core/println (cljs.core/deref ~mocks-atom-name))))
+
+(defn generate-wrapped-assertion [assertion]
+  (let [{provided#  :provided} assertion
+        mock-map#  (generate-mock-map provided#)
+        mocks-atom (gensym)]
+    `(cljs.core/let [~mocks-atom (cljs.core/atom ~mock-map#)]
+       (cljs.core/with-redefs ~(generate-mock-bindings mock-map# mocks-atom)
+                              ~(generate-assertion assertion)
+                              ~(generate-mock-validation mocks-atom)))))
 
 (defn generate-test [test-definition]
   (let [assertions# (:assertions test-definition)
         name#       (:name test-definition)]
     `(cljs.test/deftest ~(symbol name#)
-       ~@(map generate-right-hand assertions#))))
+       ~@(map generate-wrapped-assertion assertions#))))
 
 (defn generate-tests [test-runtime]
   (let [tests# (:tests test-runtime)]

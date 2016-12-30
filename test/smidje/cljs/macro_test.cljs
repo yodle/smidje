@@ -40,3 +40,8 @@
       2 => even?
       3 =not=> even?
       (+ 3 2) => #(= 5 %))
+
+(fact
+  "provided works with truth checks"
+  (bar) => truthy
+  (bar) => falsey (provided (bar) => nil))
