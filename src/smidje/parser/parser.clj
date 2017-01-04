@@ -1,5 +1,6 @@
 (ns smidje.parser.parser
   (:require [smidje.parser.arrows :refer [arrow-set]]
+            [clojure.walk :refer [prewalk]]
             [smidje.parser.checkers :refer [throws truthy TRUTHY falsey FALSEY]]))
 
 (declare generate)
@@ -22,7 +23,7 @@
 
 (defn- gen-provided-sym
   [fn1 fn2]
-  (symbol (str ".." (gensym (str fn1 "->" fn2)) ".." ))) 
+  (symbol (str ".." (gensym (str fn1 "->" fn2)) ".." )))
 
 (defn- unnest-provided
   [provided]
@@ -59,21 +60,20 @@
       :else (recur result (conj current-form (first input)) (rest input)))))
 
 (defn- aggregate-paramater-maps
-   [paramater-maps]
-   (apply hash-map (mapcat
-                    (fn [x]  [(:paramaters x) (dissoc x :paramaters :mock-function)])
-                    paramater-maps)
-          ))
+  [paramater-maps]
+  (apply hash-map (mapcat
+                   (fn [x] [(:paramaters x)
+                            (dissoc x :paramaters :mock-function)])
+                   paramater-maps)))
 
 (defn- build-provided-map
   [provided]
   (merge
-   (apply hash-map (drop 3 provided)) 
+   (apply hash-map (drop 3 provided))
    {:mock-function (first (first provided))
     :paramaters (into [] (rest (first provided)))
     :arrow (second provided)
-    :result (nth provided 2)
-    }))
+    :result (nth provided 2)}))
 
 (defn- parse-provided
   [forms]
@@ -84,9 +84,9 @@
                     (mapcat unnest-provided)
                     (map build-provided-map)
                     (group-by :mock-function)
-                    (map (fn [x] {:mock-function (first x) :return (aggregate-paramater-maps (second x))} ))
-                    )
-    }
+                    (map (fn [x]
+                           {:mock-function (first x)
+                            :return (aggregate-paramater-maps (second x))})))}
     {}))
 
 (defn- truth-testing-form? [input]
@@ -118,11 +118,16 @@
     (throws-form? form) (parse-throws form)
     :else {:expected-result form}))
 
+(defn- deconstruct-forms [forms]
+       {:call-form (nth forms 0)
+        :arrow (nth forms 1)
+        :expected-form (nth forms 2)})
+
 (defn- parse-equals
   [forms]
-  (let [call-form (nth forms 0)
-        arrow (nth forms 1)
-        expected-form (nth forms 2)]
+  (let [{call-form     :call-form
+         arrow         :arrow
+         expected-form :expected-form} (deconstruct-forms forms)]
     (merge
       {:call-form            call-form
        :arrow                arrow
@@ -131,17 +136,54 @@
       (parse-expected expected-form)
       (parse-provided forms))))
 
-
 (defn parse
   [forms]
-  (loop [result [] input forms]
+  (loop [result []
+         input forms]
     ; TODO: check for provided mocks
     ; TODO: assertions must be before provided mocks
     ; TODO: error messages on bad syntax
     (if (and (> (count input) 2)
              (is-arrow (second input)))
-      (recur (conj result (parse-equals input)) (drop (if (has-provided-form? input) 4 3 ) input))
+      (recur
+        (conj result (parse-equals input))
+        (drop (if (has-provided-form? input) 4 3) input))
       result)))
+
+(defn- macro-name
+       "Get name of target macro in form sequence"
+       [form]
+       (let [target-form (second form)]
+            (if (string? target-form)
+              (clojure.string/replace target-form #"[^\w\d]+" "-")
+              target-form)))
+
+(defn tabular*
+  "Creates tests from a table of example cases
+
+   (tabular \"test-name\"
+     (fact \"fact-name\"
+       (+ ?a ?b) => ?c)
+     ?a ?b ?c
+     1  1  2
+     2  3  5)"
+  [form]
+  (let [[macro test-name & table-forms] form]
+    (let [[fact & table] table-forms
+          [fact-macro fact-name & fact-form] fact
+          full-name (str test-name " : " fact-name)
+          symbols (take-while symbol? table)
+          bindings (->> (drop-while symbol? table)
+                        (partition (count symbols)))
+          binding-maps (map zipmap (repeat symbols) bindings)
+          walk-fns (map (fn [symbol-table]
+                          (fn [expr]
+                            (if (contains? symbol-table expr)
+                              (get symbol-table expr)
+                              expr)))
+                        binding-maps)
+          substituted-facts (map prewalk walk-fns (repeat fact-form))]
+      (concat `(smidje.core/fact ~full-name) (apply concat substituted-facts)))))
 
 (defn parse-fact
   [form]
@@ -151,4 +193,3 @@
         fact-forms (drop 2 form)]
     (-> {:tests [{:name name
          :assertions (parse fact-forms)}]})))
-
