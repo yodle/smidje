@@ -65,9 +65,28 @@
     (:throws-exception assertion) (generate-expected-exception assertion)
     :else (generate-single-assert assertion)))
 
+(defn validate-no-unexpected-calls [function-variable-name mock-info-variable-name]
+  `(cljs.core/doseq [actual-call-param# (cljs.core/keys (:calls ~mock-info-variable-name))]
+     (cljs.test/is
+       (cljs.core/contains? (:mock-config ~mock-info-variable-name) actual-call-param#)
+       (str ~function-variable-name " called with unexpected args " actual-call-param#))))
+
+(defn validate-mock-called-with-expected-args [function-variable-name mock-info-variable-name]
+  `(cljs.core/doseq [expected-call-param# (cljs.core/keys (:mock-config ~mock-info-variable-name))]
+     (cljs.test/is
+       (cljs.core/>=
+         (cljs.core/or
+           (cljs.core/get (:calls ~mock-info-variable-name) expected-call-param#)
+           0)
+         1)
+       (str ~function-variable-name " expected to be called with " expected-call-param# " but never invoked"))))
+
 (defn generate-mock-validation [mocks-atom-name]
-  `((map ~validate-mock (cljs.core/vals (cljs.core/deref ~mocks-atom-name)))
-     (cljs.core/println (cljs.core/deref ~mocks-atom-name))))
+  (let [function-var-name (gensym "mock-function")
+        mock-info-var-name (gensym "mock-info")]
+  `(cljs.core/doseq [[~function-var-name ~mock-info-var-name] (cljs.core/deref ~mocks-atom-name)]
+     ~(validate-mock-called-with-expected-args function-var-name mock-info-var-name)
+     ~(validate-no-unexpected-calls function-var-name mock-info-var-name))))
 
 (defn generate-wrapped-assertion [assertion]
   (let [{provided#  :provided} assertion
