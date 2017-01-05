@@ -1,6 +1,6 @@
 (ns smidje.cljs.macro-test
   (:require-macros [cljs.test :refer [deftest is]]
-                   [smidje.core :refer [fact]]))
+                   [smidje.core :refer [fact tabular]]))
 
 (enable-console-print!)
 
@@ -21,8 +21,14 @@
 
 (fact "name"
   (+ 1 1) => 2
-  (+ 1 3) =not=> 2
-  (+ 1 3) =not> 2)
+  (+ 1 3) =not=> 2)
+
+(tabular "tabularname"
+         (fact "factname"
+               (+ ?a ?b) => ?c)
+         ?a ?b ?c
+         1  2  3
+         3  4  7)
 
 (fact "truthy and falsey"
   true => truthy
