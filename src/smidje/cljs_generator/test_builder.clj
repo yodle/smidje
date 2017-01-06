@@ -1,12 +1,14 @@
 (ns smidje.cljs-generator.test-builder
     (:require [smidje.parser.arrows :refer [arrow-set]]
               [smidje.parser.checkers :refer [truthy falsey TRUTHY FALSEY truth-set]]
-              [smidje.cljs-generator.mocks :refer [generate-mock-function]]))
+              [smidje.cljs-generator.mocks :refer [generate-mock-function]]
+              [smidje.cljs-generator.cljs-syntax-converter :refer [clj->cljs]]
+              [clojure.test :refer [deftest is]]))
 
 (defn do-arrow [arrow]
       (cond
-        (= arrow '=>) 'cljs.core/=
-        (= arrow '=not=>) 'cljs.core/not=
+        (= arrow '=>) '=
+        (= arrow '=not=>) 'not=
         :else (throw (Exception. (format "Unknown arrow given: %s | Valid arrows: %s"
                                          arrow
                                          arrow-set)))))
@@ -44,27 +46,27 @@
   (let [{arrow#           :arrow
          test-function#   :call-form
          expected-result# :expected-result} assertion]
-    `(cljs.core/cond
-       (cljs.core/fn? ~expected-result#) (cljs.test/is (~(do-arrow arrow#) (~expected-result# ~test-function#) true))
-       :else (cljs.test/is (~(do-arrow arrow#) ~test-function# ~expected-result#)))))
+    `(cond
+       (fn? ~expected-result#) (is (~(do-arrow arrow#) (~expected-result# ~test-function#) true))
+       :else (is (~(do-arrow arrow#) ~test-function# ~expected-result#)))))
 
 (defn generate-assertion [assertion]
   (let [{provided#  :provided} assertion
         mock-map#  (generate-mock-map provided#)
         mocks-atom (gensym)]
-    `(cljs.core/let [~mocks-atom (cljs.core/atom ~mock-map#)]
-                    (cljs.core/with-redefs ~(generate-mock-bindings mock-map# mocks-atom)
+    `(let [~mocks-atom (atom ~mock-map#)]
+                    (with-redefs ~(generate-mock-bindings mock-map# mocks-atom)
                       ~(generate-single-assert assertion)))))
 
 (defn generate-truth-test [truth-test-definition]
   (let [truth-type# (:truth-testing truth-test-definition)
         test-function# (:call-form truth-test-definition)]
-    `(cljs.test/is (= (boolean ~test-function#) ~(do-truth-test truth-type#)))))
+    `(is (= (boolean ~test-function#) ~(do-truth-test truth-type#)))))
 
 (defn generate-expected-exception [exception-definition]
   (let [expected-exception (:throws-exception exception-definition)
         call-form (:call-form exception-definition)]
-    `(cljs.test/is (~'thrown? ~(symbol expected-exception) ~call-form))))
+    `(is (~'thrown? ~(symbol expected-exception) ~call-form))))
 
 (defn generate-right-hand
   [assertion]
@@ -76,9 +78,9 @@
 (defn generate-test [test-definition]
   (let [assertions# (:assertions test-definition)
         name#       (:name test-definition)]
-    `(cljs.test/deftest ~(symbol name#)
+    `(deftest ~(symbol name#)
        ~@(map generate-right-hand assertions#))))
 
 (defn generate-tests [test-runtime]
   (let [tests# (:tests test-runtime)]
-     `(do ~@(map generate-test tests#))))
+    (clj->cljs `(do ~@(map generate-test tests#)))))
