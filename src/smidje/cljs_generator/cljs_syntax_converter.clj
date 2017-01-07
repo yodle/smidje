@@ -5,14 +5,14 @@
   {"clojure.core" "cljs.core"
    "clojure.test" "cljs.test"})
 
-(defn generate-namespaced-symbol
+(defn- generate-namespaced-symbol
   "this will return a symbol with a new namespace applied if a mapping exists
   otherwise this returns the symbol using the specified namespace"
   [[namespace function]]
   (let [new-namespace (or (get namespace-map namespace) namespace)]
       (symbol (join "/" [new-namespace function]))))
 
-(defn convert-symbol
+(defn- convert-symbol
   "given a symbol this will return a clojurescript compatible symbol"
   [symbol]
   (let [parsed-symbol (split (str symbol) #"/")

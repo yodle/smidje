@@ -1,6 +1,6 @@
 (ns smidje.clj.parser.parser-test
   (:require [midje.sweet :as m]
-            [smidje.clj.parser.intermediate-maps :as im]
+            [smidje.clj.intermediate-maps :as im]
             [smidje.parser.parser :as parser :refer :all])
   (:use     [midje.util :only [expose-testables]]))
 
@@ -12,13 +12,13 @@
   '((+ 1 1) => 2))
 
 (m/fact "simple addition"
-        (parser/parse simple-addition-fact) => [im/simple-addition-assertion])
+        (parser/parse simple-addition-fact) => [im/simple-successful-addition-assertion])
 
 (def simple-addition-unequal-fact
   '((+ 1 1) =not=> 3))
 
 (m/fact "simple addition unequal"
-        (parser/parse simple-addition-unequal-fact) => [im/simple-addtion-not-assertion])
+        (parser/parse simple-addition-unequal-fact) => [im/simple-addition-successful-not-assertion])
 
 (m/fact "throws validator recognizes right hand expected exception"
   (throws-form? '(throws)) => true
