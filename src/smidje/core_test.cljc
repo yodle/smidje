@@ -1,10 +1,11 @@
-(ns smidje.core
-  (:require [smidje.cljs-generator.test-builder :as cljs-builder]
-            [smidje.parser.parser :as parser]))
+(ns smidje.core-test
+  (:require
+    #?(:cljs [smidje.cljs-generator.test-builder])
+    #?(:clj [smidje.parser.parser :as parser])))
 
 (defmacro fact [& args]
-  (-> (parser/parse-fact &form)
-      println))
+  (let [test-configuration# (parser/parse-fact &form)]
+    `(smidje.cljs-generator.test-builder/generate-tests ~test-configuration#)))
 
 (defmacro tabular [& _]
   (parser/tabular* &form))

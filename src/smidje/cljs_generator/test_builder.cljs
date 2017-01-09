@@ -46,27 +46,27 @@
   (let [{arrow#           :arrow
          test-function#   :call-form
          expected-result# :expected-result} assertion]
-    `(cond
-       (fn? ~expected-result#) (is (~(do-arrow arrow#) (~expected-result# ~test-function#) true))
-       :else (is (~(do-arrow arrow#) ~test-function# ~expected-result#)))))
+    (cond
+       (fn? expected-result#) (is ((do-arrow arrow#) (expected-result# test-function#) true))
+       :else (is ((do-arrow arrow#) test-function# expected-result#)))))
 
 (defn generate-assertion [assertion]
   (let [{provided#  :provided} assertion
         mock-map#  (generate-mock-map provided#)
         mocks-atom (gensym)]
-    `(let [~mocks-atom (atom ~mock-map#)]
+    (let [mocks-atom (atom mock-map#)]
                     (with-redefs ~(generate-mock-bindings mock-map# mocks-atom)
-                      ~(generate-single-assert assertion)))))
+                      (generate-single-assert assertion)))))
 
 (defn generate-truth-test [truth-test-definition]
   (let [truth-type# (:truth-testing truth-test-definition)
         test-function# (:call-form truth-test-definition)]
-    `(is (= (boolean ~test-function#) ~(do-truth-test truth-type#)))))
+    (is (= (boolean test-function#) (do-truth-test truth-type#)))))
 
 (defn generate-expected-exception [exception-definition]
   (let [expected-exception (:throws-exception exception-definition)
         call-form (:call-form exception-definition)]
-    `(is (~'thrown? ~(symbol expected-exception) ~call-form))))
+    (is (thrown? (symbol expected-exception) call-form))))
 
 (defn generate-right-hand
   [assertion]
@@ -75,15 +75,18 @@
     (:throws-exception assertion) (generate-expected-exception assertion)
     :else (generate-assertion assertion)))
 
-(defn generate-test [test-definition]
+(defn run-test [test-definition]
   (let [assertions# (:assertions test-definition)
         name#       (:name test-definition)]
-    `(deftest ~(symbol name#)
-       ~@(map generate-right-hand assertions#))))
+    (println test-definition)
+    (println name#)
+    (println assertions#)
+    (deftest name#
+       (map println assertions#)))
 
 (defn generate-tests [test-runtime]
   (let [tests# (:tests test-runtime)]
-    (clj->cljs `(do ~@(map generate-test tests#)))))
+    (doall (map run-test tests#))))
 
 (defn process-test-data [data]
   (println data))

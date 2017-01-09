@@ -72,7 +72,7 @@
    (apply hash-map (drop 3 provided))
    {:mock-function (first (first provided))
     :paramaters (into [] (rest (first provided)))
-    :arrow (second provided)
+    :arrow  (second provided)
     :result (nth provided 2)}))
 
 (defn- parse-provided
@@ -107,7 +107,7 @@
   (merge
     ; TODO: validate that second argument is an exception type
     ; TODO: validate optional third argument is a string
-    {:throws-exception (second form)}
+    {:throws-exception `'~(second form)}
     (when (> (count form) 2)
       {:throws-message (nth form 2)})))
 
@@ -119,9 +119,9 @@
     :else {:expected-result form}))
 
 (defn- deconstruct-forms [forms]
-       {:call-form (nth forms 0)
-        :arrow (nth forms 1)
-        :expected-form (nth forms 2)})
+       {:call-form `'~(nth forms 0)
+        :arrow `'~(nth forms 1)
+        :expected-form `'~(nth forms 2)})
 
 (defn- parse-equals
   [forms]
@@ -131,8 +131,7 @@
     (merge
       {:call-form            call-form
        :arrow                arrow
-       :expected-result      expected-form
-       :expected-result-form `'~expected-form}
+       :expected-result      expected-form}
       (parse-expected expected-form)
       (parse-provided forms))))
 
@@ -183,7 +182,7 @@
                               expr)))
                         binding-maps)
           substituted-facts (map prewalk walk-fns (repeat fact-form))]
-      (concat `(smidje.core/fact ~full-name) (apply concat substituted-facts)))))
+      (concat `(smidje.core-test/fact ~full-name) (apply concat substituted-facts)))))
 
 (defn parse-fact
   [form]
