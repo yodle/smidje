@@ -1,17 +1,17 @@
 (ns smidje.cljs-generator.test-builder
     (:require [smidje.parser.arrows :refer [arrow-set]]
-              [smidje.parser.checkers :refer [truthy falsey TRUTHY FALSEY truth-set]]
-              [smidje.cljs-generator.mocks :refer [generate-mock-function]]
-              [smidje.cljs-generator.cljs-syntax-converter :refer [clj->cljs]]
-              [clojure.test :refer [deftest is]]))
+              [cljs.test :refer-macros [deftest testing is run-tests]]
+              ;[smidje.parser.checkers :refer [truthy falsey TRUTHY FALSEY truth-set]]
+              ;[smidje.cljs-generator.mocks :refer [generate-mock-function]]
+              ;[smidje.cljs-generator.cljs-syntax-converter :refer [clj->cljs]]
+              )
+  )
 
 (defn do-arrow [arrow]
       (cond
         (= arrow '=>) '=
         (= arrow '=not=>) 'not=
-        :else (throw (Exception. (format "Unknown arrow given: %s | Valid arrows: %s"
-                                         arrow
-                                         arrow-set)))))
+        :else (throw (js/Error (str "Unknown arrow given: " arrow " | Valid arrows: " arrow-set)))))
 
 (defn do-truth-test [form]
   (cond
@@ -19,8 +19,7 @@
     (= form 'TRUTHY) true
     (= form 'falsey) false
     (= form 'FALSEY) false
-    :else (throw (Exception. (format "Unknown truth testing expression: %s | Valid expressions: %s"
-                                     form truth-set)))))
+    :else (throw (js/Error (str "Unknown truth testing expression: " form " | Valid expressions: " truth-set)))))
 
 (defn generate-mock-binding [mocks-atom]
   (fn [mock-data-map]
@@ -78,15 +77,17 @@
 (defn run-test [test-definition]
   (let [assertions# (:assertions test-definition)
         name#       (:name test-definition)]
-    (println test-definition)
-    (println name#)
-    (println assertions#)
-    (deftest name#
-       (map println assertions#)))
+    (testing name#
+      (is (= 1 0))
+      ;(map generate-right-hand assertions#)
+      )))
 
 (defn generate-tests [test-runtime]
-  (let [tests# (:tests test-runtime)]
-    (doall (map run-test tests#))))
+  ;(let [tests# (:tests test-runtime)]
+  ;   (map run-test tests#)))
+  (is (= 1 0))
+  )
 
-(defn process-test-data [data]
-  (println data))
+;
+;(defn process-test-data [data]
+;  (println data))

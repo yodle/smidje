@@ -1,6 +1,6 @@
 (ns smidje.cljs.macro-test
-  (:require [smidje.core-test :refer [fact tabular] :include-macros true])
-  (:require-macros [cljs.test :refer [deftest is]]))
+  (:require [smidje.core-test :refer-macros [fact tabular]]
+            [cljs.test :refer-macros [deftest testing is]]))
 
 (enable-console-print!)
 
@@ -13,9 +13,22 @@
 (defn foo []
   (+ (bar) (thing 1)))
 
-(fact "name"
+(println (macroexpand-1 '(fact "name"
   (+ 1 1) => 2
-  (+ 1 3) =not=> 2)
+  (+ 1 3) =not=> 2)))
+
+(fact "name"
+      (+ 1 1) => 2
+      (+ 1 3) =not=> 2)
+
+;(defn t [name assert]
+;  (testing name
+;    (is assert)))
+;
+;(defn func [name assert]
+;  (let [a 1]
+;  (deftest smidje-test
+;    (t name assert))))
 
 ;(fact "multi-provided"
 ;      (foo) => 2
