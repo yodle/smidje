@@ -1,28 +1,45 @@
 (ns smidje.clj.cljs-generator.test-builder-test
   (:require [midje.sweet :refer :all]
-            [smidje.clj.parser.intermediate-maps :as im]
+            [smidje.clj.intermediate-maps :as im]
             [smidje.cljs-generator.test-builder :refer :all]))
 
-(fact "a single expect match arrow fact"
-      (generate-single-assert im/simple-addition-assertion)
-      => `(cljs.core/cond
-            (cljs.core/fn? 2) (cljs.test/is (cljs.core/= (2 (~'+ 1 1)) true))
-            :else (cljs.test/is (cljs.core/= (~'+ 1 1) 2))))
+(defmulti new-report (fn [& args] :default))
+(defmethod new-report :default [& args] {})
 
-(fact "a single not assertion fact"
-      (generate-single-assert im/simple-addtion-not-assertion)
-      => `(cljs.core/cond
-            (cljs.core/fn? 3) (cljs.test/is (cljs.core/not= (3 (~'+ 1 1)) true))
-            :else (cljs.test/is (cljs.core/not= (~'+ 1 1) 3))))
+(with-redefs [clojure.test/report new-report]               ;required to suppress clojure.test output from methods under test
 
-(fact "simple throws"
-      (generate-expected-exception im/expected-exception-assertion)
-      => '(cljs.test/is (thrown? InvalidFooError (foo nil))))
+  (facts
+    "generate-single-assert with normal arrow"
+    (fact
+      "successful assertion with constant succeeds"
+      (eval (generate-single-assert im/simple-successful-addition-assertion)) => true)
+    (fact
+      "failed assertion with constant fails"
+      (eval (generate-single-assert im/simple-failing-addition-assertion)) => false)
+    (fact
+      "successful assertion with checker function succeeds"
+      (eval (generate-single-assert im/simple-successful-checker-function-assertion)) => true)
+    (fact
+      "failed assertion with checker function fails"
+      (eval (generate-single-assert im/simple-failed-checker-function-assertion)) => false))
 
-(tabular
- (fact "arrows generate correct equality checks"
-       (do-arrow ?arrow) => ?expected)
- ?arrow     ?expected
- '=>        'cljs.core/=
- '=not=>    'cljs.core/not=
- '=bogus=>  (throws Exception))
+  (facts
+    "generate-single-assert with not arrow"
+    (fact
+      "successful assertion with constant succeeds"
+      (eval (generate-single-assert im/simple-addition-successful-not-assertion)) => true)
+    (fact
+      "failed assertion with constant fails"
+      (eval (generate-single-assert im/simple-addition-failed-not-assertion)) => false))
+
+  (fact "simple throws form correct"
+        (generate-expected-exception im/expected-exception-assertion)
+        => '(clojure.test/is (thrown? Exception (smidje.clj.intermediate-maps/foo nil))))
+
+  (tabular
+    (fact "arrows generate correct equality checks"
+          (do-arrow ?arrow) => ?expected)
+    ?arrow ?expected
+    '=> '=
+    '=not=> 'not=
+    '=bogus=> (throws Exception)))
