@@ -7,13 +7,17 @@
 
 (defn- generate-namespaced-symbol
   "this will return a symbol with a new namespace applied if a mapping exists
-  otherwise this returns the symbol using the specified namespace"
+  otherwise this returns the symbol with it's existing namespace. for example
+  clojure.test/is -> cljs.test/is
+  my.namespace/func -> my.namespace/func"
   [[namespace function]]
   (let [new-namespace (or (get namespace-map namespace) namespace)]
       (symbol (join "/" [new-namespace function]))))
 
 (defn- convert-symbol
-  "given a symbol this will return a clojurescript compatible symbol"
+  "given a symbol this will return a clojurescript compatible symbol for example
+  clojure.test/is -> cljs.test/is
+  func -> func"
   [symbol]
   (let [parsed-symbol (split (str symbol) #"/")
         symbol-count  (count parsed-symbol)]
