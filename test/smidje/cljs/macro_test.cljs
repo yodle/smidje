@@ -14,9 +14,9 @@
 (defn foo []
   (+ (bar) (thing 1)))
 
-(fact "name"
-  (+ 1 1) => 2
-  (+ 1 3) =not=> 2)
+;(fact "name"
+;  (+ 1 1) => 2
+;  (+ 1 3) =not=> 2)
 
 ;(fact "name"
 ;      (+ 1 1) => 2

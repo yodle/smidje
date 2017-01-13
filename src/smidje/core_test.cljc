@@ -1,12 +1,13 @@
 (ns smidje.core-test
   (:require
     #?(:cljs [smidje.cljs-generator.test-builder])
-    #?(:cljs [cljs.test :refer [inc-report-counter!]])
+    #?(:cljs [cljs.test :refer [inc-report-counter! get-current-env]])
     #?(:clj [smidje.parser.parser :as parser])))
 
 (defmulti reporter (fn [& args] :default) :default {})
 (defmethod reporter :default [report]
   (println report)
+  #?(:cljs (println (get-current-env)))
   #?(:cljs (inc-report-counter! (:type report))))
 
 (defmacro fact [& args]

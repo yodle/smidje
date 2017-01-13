@@ -78,7 +78,6 @@
   (let [assertions# (:assertions test-definition)
         name#       (:name test-definition)]
     (testing name#
-      (println assertions#)
       (doall (map generate-right-hand assertions#)))))
 
 (defn generate-tests [test-runtime]
