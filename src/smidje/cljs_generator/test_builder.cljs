@@ -9,8 +9,8 @@
 
 (defn do-arrow [arrow]
       (cond
-        (= arrow '=>) '=
-        (= arrow '=not=>) 'not=
+        (= arrow '=>) =
+        (= arrow '=not=>) not=
         :else (throw (js/Error (str "Unknown arrow given: " arrow " | Valid arrows: " arrow-set)))))
 
 (defn do-truth-test [form]
@@ -78,15 +78,20 @@
   (let [assertions# (:assertions test-definition)
         name#       (:name test-definition)]
     (testing name#
-      (is (= 1 0))
-      ;(map generate-right-hand assertions#)
-      )))
+      (println assertions#)
+      (doall (map generate-right-hand assertions#)))))
 
 (defn generate-tests [test-runtime]
-  ;(let [tests# (:tests test-runtime)]
-  ;   (map run-test tests#)))
-  (is (= 1 0))
-  )
+  (let [tests# (:tests test-runtime)]
+    (doall (map run-test tests#))))
+
+;({:type :pass, :expected 2, :actual (2), :message nil})
+;({:file test_builder_test.clj, :line 9, :type :fail, :diffs ([3 (2 3)]), :expected 2, :actual (3), :message nil})
+;({:type :pass, :expected true, :actual (true), :message nil})
+;({:file test_builder_test.clj, :line 9, :type :fail, :diffs ([true (false true)]), :expected false, :actual (true), :message nil})
+;({:type :pass, :expected (not= (+ 1 1) 3), :actual (#object[clojure.core$not_EQ_ 0x3448a248 clojure.core$not_EQ_@3448a248] 2 3), :message nil})
+;({:file test_builder_test.clj, :line 9, :type :fail, :expected (not= (+ 1 1) 2), :actual (not (not= 2 2)), :message nil})
+
 
 ;
 ;(defn process-test-data [data]

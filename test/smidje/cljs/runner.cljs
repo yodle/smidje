@@ -1,5 +1,7 @@
-(ns smidje.cljs.runner
+(ns runner
     (:require [doo.runner :refer-macros [doo-tests]]
-              [smidje.cljs.macro-test]))
+              [macro-test]
+              [second]))
 
-(doo-tests 'smidje.cljs.macro-test)
+(doo-tests 'macro-test
+           'second)

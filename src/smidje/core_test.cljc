@@ -1,15 +1,21 @@
 (ns smidje.core-test
   (:require
     #?(:cljs [smidje.cljs-generator.test-builder])
+    #?(:cljs [cljs.test :refer [inc-report-counter!]])
     #?(:clj [smidje.parser.parser :as parser])))
+
+(defmulti reporter (fn [& args] :default) :default {})
+(defmethod reporter :default [report]
+  (println report)
+  #?(:cljs (inc-report-counter! (:type report))))
 
 (defmacro fact [& args]
   (let [test-configuration# (parser/parse-fact &form)
         test-name           (gensym)]
-    `(cljs.core/let [test-configuration# ~test-configuration#]
-       (cljs.test/deftest ~test-name
-         (cljs.test/is (cljs.core/= 1 0))
-         smidje.cljs-generator.test-builder/generate-tests test-configuration#))))
+  `(cljs.core/let [test-configuration# ~test-configuration#]
+      (cljs.test/deftest ~test-name
+        (binding [cljs.test/report reporter]
+          (smidje.cljs-generator.test-builder/generate-tests test-configuration#))))))
 
 (defmacro tabular [& _]
   (parser/tabular* &form))

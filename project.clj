@@ -18,7 +18,7 @@
   :cljsbuild {:builds [{:id           "test"
                         :source-paths ["src/smidje" "test/smidje/cljs"]
                         :compiler     {:output-to     "resources/public/js/compiled/test.js"
-                                       :main          smidje.cljs.runner
+                                       :main          runner
                                        :optimizations :none
                                        :foreign-libs  [{:provides ["cljsjs.react"]
                                                         :file     "https://cdnjs.cloudflare.com/ajax/libs/react/15.3.2/react-with-addons.js"
