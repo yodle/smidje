@@ -2,7 +2,7 @@
     (:require [smidje.parser.arrows :refer [arrow-set]]
               [cljs.test :refer-macros [deftest testing is run-tests]]
               ;[smidje.parser.checkers :refer [truthy falsey TRUTHY FALSEY truth-set]]
-              ;[smidje.cljs-generator.mocks :refer [generate-mock-function]]
+              [smidje.cljs-generator.mocks :refer [generate-mock-function]]
               ;[smidje.cljs-generator.cljs-syntax-converter :refer [clj->cljs]]
               )
   )
@@ -80,9 +80,15 @@
     (testing name#
       (doall (map generate-right-hand assertions#)))))
 
+(defmethod cljs.test/report [::default ::smidje-fail] [m]
+  (println m)
+  (cljs.test/inc-report-counter! :pass))
+
 (defn generate-tests [test-runtime]
   (let [tests# (:tests test-runtime)]
-    (doall (map run-test tests#))))
+    (doall (map run-test tests#))
+    ;(cljs.test/report {:type :smidje-fail, :expected 2, :actual '(2), :message nil})
+    ))
 
 ;({:type :pass, :expected 2, :actual (2), :message nil})
 ;({:file test_builder_test.clj, :line 9, :type :fail, :diffs ([3 (2 3)]), :expected 2, :actual (3), :message nil})
