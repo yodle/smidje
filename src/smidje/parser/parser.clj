@@ -3,8 +3,6 @@
             [clojure.walk :refer [prewalk]]
             [smidje.parser.checkers :refer [throws truthy TRUTHY falsey FALSEY]]))
 
-(declare generate)
-
 (def provided "provided")
 
 (defn- is-arrow
@@ -150,6 +148,25 @@
         (drop (if (has-provided-form? input) 4 3) input))
       result)))
 
+(defn- ^{:testable true} metaconstant-name? [element-name]
+  (or (re-matches #"^\.\..+\.\.$" element-name)
+      (re-matches #"^--.+--$" element-name)))
+
+(defn- ^{:testable true} metaconstant? [element]
+  (and (symbol? element)
+       (metaconstant-name? (name element))))
+
+(defn parse-metaconstants
+  [form]
+  (cond
+    (seq? form) (->> (flatten form)
+                     (filter metaconstant?)
+                     (map keyword)
+                     (distinct)
+                     (into []))
+    (metaconstant? form) [(keyword (name form))]
+    :else []))
+
 (defn- macro-name
        "Get name of target macro in form sequence"
        [form]
@@ -191,5 +208,6 @@
                (clojure.string/replace (second form) #"[^\w\d]+" "-")
                (second form))
         fact-forms (drop 2 form)]
-    (-> {:tests [{:name name
-         :assertions (parse fact-forms)}]})))
+    (-> {:tests [{:name       name
+                  :assertions (parse fact-forms)
+                  :metaconstants (parse-metaconstants fact-forms)}]})))
