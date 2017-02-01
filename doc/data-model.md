@@ -9,6 +9,7 @@ the map into cljs-test syntax.
 {:namespace ""
  :tests [{
             :name ""
+            :metaconstants [...]
             :assertions [{
                             :function-under-test ""
                             :call-form ""
@@ -27,6 +28,7 @@ the map into cljs-test syntax.
 `:namespace`- The namespace of the fact.  
 `:tests`- A vector of facts (this will be used for nesting which is not supported yet).  
 `:name`- The name of a single fact.  
+`:metaconstants`- A vector of metaconstant keywords that need to be bound for the assertions.
 `:assertions`- A vector of assertions which are individual arrow statements for example `(+ 1 1) => 2`  
 `:function-under-test`- Quoted form of the function under test (the left side of the arrow)  
 `:call-form`- The unquoted function under test  

@@ -76,3 +76,44 @@
         (provided-form? '(provided)) => true                ; recognizes provided form
         (provided-form? '(normal-return-path)) => false     ; does not recognize other forms as provided
         (provided-form? 2) => false)                        ; does not recognize non-forms as provided form
+
+(m/tabular
+  (m/fact "`metaconstant-name?` returns expected truthiness"
+          (metaconstant-name? ?input) => ?result)
+  ?input    ?result
+  "..foo.." m/truthy
+  "--foo--" m/truthy
+  "--foo.." m/FALSEY
+  "..foo--" m/FALSEY
+  "-foo-"   m/FALSEY
+  "foo"     m/FALSEY
+  "__foo__" m/FALSEY)
+
+(m/tabular
+  (m/fact "`metaconstant?` returns expected truthiness"
+          (metaconstant? ?input) => ?result)
+  ?input    ?result
+  '--foo--  m/truthy
+  '..bar..  m/truthy
+  "--foo--" m/FALSEY
+  nil       m/FALSEY
+  '=>       m/FALSEY
+  'foo      m/FALSEY)
+
+(m/facts "about `parse-metaconstants`"
+  (m/fact "returns an empty list for non-metaconstant single input"
+          (parse-metaconstants ..form..) => []
+          (m/provided
+            (#'smidje.parser.parser/metaconstant? ..form..) m/=> false))
+  (m/fact "returns list of expected consants given list"
+          (parse-metaconstants '(hi ..hello.. "..there..")) => [:..hello..]
+          (parse-metaconstants '(this "returns" nothing)) => []
+          (parse-metaconstants '..foo..) => [:..foo..]
+          (parse-metaconstants '(duplicates ..are.. --not-- --not-- --not-- a problem))
+                                => [:..are.. :--not--]
+          (parse-metaconstants '(--also-- (..it.. (--will--) --flatten--)))
+                                => [:--also-- :..it.. :--will-- :--flatten--]
+          (parse-metaconstants '(mixed --flattened-- (inputs "--cause--" (--no-- problems) ..either..)))
+                                => [:--flattened-- :--no-- :..either..]
+          (parse-metaconstants '((something --foo-- ..input..) => ..result.. (provided (--foo-- ..input..) => ..result)))
+                                => [:--foo-- :..input.. :..result..]))
