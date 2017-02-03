@@ -11,7 +11,7 @@
                                   [org.clojure/tools.nrepl "0.2.12"]
                                   [midje-junit-formatter "0.1.0-SNAPSHOT"]
                                   [org.clojure/clojurescript "1.9.229"]]
-                   :plugins      [[lein-doo "0.1.6"]
+                   :plugins      [[lein-doo "0.1.7"]
                                   [lein-cljsbuild "1.1.3"]
                                   [lein-midje "3.2"]]}}
 

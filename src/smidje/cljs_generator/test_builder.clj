@@ -85,20 +85,48 @@
        ~(validate-mock-called-with-expected-args function-var-name mock-info-var-name)
        ~(validate-no-unexpected-calls function-var-name mock-info-var-name))))
 
-(defn generate-wrapped-assertion [assertion]
+(defn list-contains? [list object]
+  (some #(= object %) list))
+
+(defn parse-metaconstant-functions [metaconstants mock-map]
+  (into
+    {}
+    (filter
+      (fn [[keystring :as mock]]
+        (if (list-contains? metaconstants (keyword keystring))
+          mock))
+      mock-map)))
+
+(defn generate-wrapped-assertion [metaconstants assertion]
   (let [{provided# :provided} assertion
-        mock-map# (generate-mock-map provided#)
-        mocks-atom (gensym)]
-    `(let [~mocks-atom (atom ~mock-map#)]
-       (with-redefs ~(generate-mock-bindings mock-map# mocks-atom)
+        complete-mock-map (generate-mock-map provided#)
+        mocks-atom (gensym)
+        unbound-mocks (parse-metaconstant-functions metaconstants complete-mock-map)
+        bound-mocks (apply dissoc complete-mock-map (keys unbound-mocks))]
+    `(let ~(into [] (concat [mocks-atom `(atom ~complete-mock-map)]
+                            (generate-mock-bindings unbound-mocks mocks-atom)))
+       (with-redefs ~(generate-mock-bindings bound-mocks mocks-atom)
          ~(generate-assertion assertion)
          ~(generate-mock-validation mocks-atom)))))
 
+(defn generate-metaconstant-bindings [metaconostants]
+   (->> (map
+          (fn [metaconstant]
+            [(symbol (name metaconstant))
+             `(fn [])])
+          metaconostants)
+        (flatten)
+        (into [])))
+
 (defn generate-test [test-definition]
-  (let [assertions# (:assertions test-definition)
-        name# (:name test-definition)]
+  (let [{assertions# :assertions
+         name# :name
+         metaconstants# :metaconstants} test-definition]
     `(deftest ~(symbol name#)
-       ~@(map generate-wrapped-assertion assertions#))))
+       (let ~(generate-metaconstant-bindings metaconstants#)
+         ~@(map
+             (partial generate-wrapped-assertion metaconstants#)
+             assertions#)))))
 
 (defn generate-tests [test-runtime]
   (let [tests# (:tests test-runtime)]

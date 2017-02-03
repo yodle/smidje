@@ -51,3 +51,13 @@
   "provided works with truth checks"
   (bar) => truthy
   (bar) => falsey (provided (bar) => nil))
+
+(fact
+  "meta constant"
+  (#(identity %) --test--) => --test--)
+
+(fact
+  "meta constant function"
+  (#(--func-- %) --test--) => 1
+  (provided
+    (--func-- --test--) => 1))
