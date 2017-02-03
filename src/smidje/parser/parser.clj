@@ -156,16 +156,42 @@
   (and (symbol? element)
        (metaconstant-name? (name element))))
 
+(defn- pre-parse-metaconstants
+  [form]
+  (->> (vector form)
+       (flatten)
+       (filter metaconstant?)
+       (map keyword)
+       (distinct)))
+
+(defn- gen-metaconstant-sym [mc]
+  (let [mc-name (name mc)
+        mc-length (count mc-name)
+        mc-undecorated-name (subs mc-name 2 (- mc-length 2))
+        mc-prefix (if (= (subs mc-name 0 2) "..") "dot" "dash")]
+    (gensym (str "smidje->mc->" mc-prefix "->" mc-undecorated-name "->"))))
+
+(defn- gen-metaconstant-syms
+  [metaconstants]
+  (map gen-metaconstant-sym metaconstants))
+
 (defn parse-metaconstants
   [form]
-  (cond
-    (seq? form) (->> (flatten form)
-                     (filter metaconstant?)
-                     (map keyword)
-                     (distinct)
-                     (into []))
-    (metaconstant? form) [(keyword (name form))]
-    :else []))
+  (let [metaconstants (pre-parse-metaconstants form)
+        swapped (gen-metaconstant-syms metaconstants)]
+    (zipmap metaconstants swapped)))
+
+(defn- replace-metaconstant
+  [mc-lookup form]
+  (if (metaconstant? form)
+    (get mc-lookup (keyword (name form)))
+    form))
+
+(defn- ^{:testable true} replace-metaconstants
+  [mc-lookup form]
+  (if-not (seq? form)
+    (replace-metaconstant mc-lookup form)
+    (clojure.walk/walk (partial replace-metaconstants mc-lookup) identity form)))
 
 (defn- macro-name
        "Get name of target macro in form sequence"
@@ -207,7 +233,9 @@
   (let [name (if (string? (second form))
                (clojure.string/replace (second form) #"[^\w\d]+" "-")
                (second form))
-        fact-forms (drop 2 form)]
+        fact-forms (drop 2 form)
+        metaconstants (parse-metaconstants fact-forms)
+        adjusted-forms (replace-metaconstants metaconstants fact-forms)]
     (-> {:tests [{:name       name
-                  :assertions (parse fact-forms)
-                  :metaconstants (parse-metaconstants fact-forms)}]})))
+                  :assertions (parse adjusted-forms)
+                  :metaconstants metaconstants}]})))
