@@ -1,6 +1,6 @@
 (ns smidje.cljs.macro-test
-  (:require-macros [cljs.test :refer [deftest is]]
-                   [smidje.core :refer [fact tabular]]))
+  (:require [smidje.core :refer-macros [fact tabular]])
+  (:require-macros [cljs.test :refer [deftest is]]))
 
 (enable-console-print!)
 
