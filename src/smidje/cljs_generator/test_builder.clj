@@ -74,7 +74,7 @@
     {}
     (filter
       (fn [[keystring :as mock]]
-        (if (list-contains? metaconstants (keyword keystring))
+        (when (list-contains? metaconstants (keyword keystring))
           mock))
       mock-map)))
 

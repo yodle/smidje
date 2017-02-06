@@ -42,4 +42,19 @@
     ?arrow ?expected
     '=> '=
     '=not=> 'not=
-    '=bogus=> (throws Exception)))
+    '=bogus=> (throws Exception))
+
+  (facts
+    "parse-metaconstant-functions"
+    (fact
+      "no metaconstants returns empty map"
+      (let [mock-map {:func1 :mock1
+                      :func2 :mock2}]
+        (parse-metaconstant-functions [] mock-map) => {}))
+
+    (fact
+      "only metaconstants returned"
+      (let [metaconstants [:func1]
+            mock-map {:func1 :mock1
+                      :func2 :mock2}]
+        (parse-metaconstant-functions metaconstants mock-map) => {:func1 :mock1}))))
