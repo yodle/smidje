@@ -101,19 +101,68 @@
   'foo      m/FALSEY)
 
 (m/facts "about `parse-metaconstants`"
-  (m/fact "returns an empty list for non-metaconstant single input"
-          (parse-metaconstants ..form..) => []
+  (m/fact "returns an empty map for non-metaconstant single input"
+          (parse-metaconstants ..form..) => {}
           (m/provided
             (#'smidje.parser.parser/metaconstant? ..form..) m/=> false))
   (m/fact "returns list of expected consants given list"
-          (parse-metaconstants '(hi ..hello.. "..there..")) => [:..hello..]
-          (parse-metaconstants '(this "returns" nothing)) => []
-          (parse-metaconstants '..foo..) => [:..foo..]
+          (parse-metaconstants '(this "returns" nothing)) => {}
+
+          (parse-metaconstants '(hi ..hello.. "..there..")) => {'..hello.. ..gensym..}
+          (m/provided
+            (gensym "smidje->mc->dot->hello->") m/=> ..gensym..)
+
+          (parse-metaconstants '..foo..) => {'..foo.. ..gensym..}
+          (m/provided
+            (gensym "smidje->mc->dot->foo->") m/=> ..gensym..)
+
           (parse-metaconstants '(duplicates ..are.. --not-- --not-- --not-- a problem))
-                                => [:..are.. :--not--]
+          => {'..are.. ..gensym1..
+              '--not-- ..gensym2..}
+          (m/provided
+            (gensym "smidje->mc->dot->are->") m/=> ..gensym1..
+            (gensym "smidje->mc->dash->not->") m/=> ..gensym2..)
+
           (parse-metaconstants '(--also-- (..it.. (--will--) --flatten--)))
-                                => [:--also-- :..it.. :--will-- :--flatten--]
+          => {'--also--    ..gensym1..
+              '..it..      ..gensym2..
+              '--will--    ..gensym3..
+              '--flatten-- ..gensym4..}
+          (m/provided
+            (gensym "smidje->mc->dash->also->") m/=> ..gensym1..
+            (gensym "smidje->mc->dot->it->") m/=> ..gensym2..
+            (gensym "smidje->mc->dash->will->") m/=> ..gensym3..
+            (gensym "smidje->mc->dash->flatten->") m/=> ..gensym4..)
+
           (parse-metaconstants '(mixed --flattened-- (inputs "--cause--" (--no-- problems) ..either..)))
-                                => [:--flattened-- :--no-- :..either..]
+          => {'--flattened-- ..gensym1..
+              '--no--        ..gensym2..
+              '..either..    ..gensym3..}
+          (m/provided
+            (gensym "smidje->mc->dash->flattened->") m/=> ..gensym1..
+            (gensym "smidje->mc->dash->no->") m/=> ..gensym2..
+            (gensym "smidje->mc->dot->either->") m/=> ..gensym3..)
+
           (parse-metaconstants '((something --foo-- ..input..) => ..result.. (provided (--foo-- ..input..) => ..result)))
-                                => [:--foo-- :..input.. :..result..]))
+          => {'--foo--    ..gensym1..
+              '..input..  ..gensym2..
+              '..result.. ..gensym3..}
+          (m/provided
+            (gensym "smidje->mc->dash->foo->") m/=> ..gensym1..
+            (gensym "smidje->mc->dot->input->") m/=> ..gensym2..
+            (gensym "smidje->mc->dot->result->") m/=> ..gensym3..)))
+
+(m/fact "`replace-metaconstants` replaceces metaconstant symbols with values in symbol table"
+        (replace-metaconstants {} "foo") => "foo"
+
+        (replace-metaconstants {} '(nothing to see here)) => '(nothing to see here)
+
+        (replace-metaconstants
+          {'--foo-- ..gensym1.. '..foo.. ..gensym2..}
+          '(this --foo-- ..foo..))
+        => '(this ..gensym1.. ..gensym2..)
+
+        (replace-metaconstants
+          {'--mc1-- ..gensym1.. '..mc1.. ..gensym2.. '..mc2.. ..gensym3..}
+          '(--mc1-- ..mc1.. (--mc1-- "..mc1.." ..mc2.. (..mc2.. "foo") ..mc1..)))
+        => '(..gensym1.. ..gensym2.. (..gensym1.. "..mc1.." ..gensym3.. (..gensym3.. "foo") ..gensym2..)))
