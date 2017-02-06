@@ -28,7 +28,8 @@ the map into cljs-test syntax.
 `:namespace`- The namespace of the fact.  
 `:tests`- A vector of facts (this will be used for nesting which is not supported yet).  
 `:name`- The name of a single fact.  
-`:metaconstants`- A map of metaconstants info, with keys set to the metaconstant symbol as a keyword, and values
+`:metaconstants`- A map of metaconstant info, with keys set to a generated, bindable symbol that can represent the
+ metaconstant in test generation, mapped to the original metaconstant symbol.
 set to generated symbols that the metaconstant is replaced with in the adjusted form.
 `:assertions`- A vector of assertions which are individual arrow statements for example `(+ 1 1) => 2`  
 `:function-under-test`- Quoted form of the function under test (the left side of the arrow)  
