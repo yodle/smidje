@@ -157,27 +157,28 @@
        (metaconstant-name? (name element))))
 
 (defn- pre-parse-metaconstants
+  "Returns a list of unique metaconstants symbols in the form.
+   The form can be a single element or a variably-nested list."
   [form]
   (->> (vector form)
        (flatten)
        (filter metaconstant?)
        (distinct)))
 
-(defn- gen-metaconstant-sym [mc]
+(defn- gen-metaconstant-sym
+  "Generates a unique, bindable symbol for the metaconstant symbol."
+  [mc]
   (let [mc-name (name mc)
         mc-length (count mc-name)
         mc-undecorated-name (subs mc-name 2 (- mc-length 2))
         mc-prefix (if (= (subs mc-name 0 2) "..") "dot" "dash")]
     (gensym (str "smidje->mc->" mc-prefix "->" mc-undecorated-name "->"))))
 
-(defn- gen-metaconstant-syms
-  [metaconstants]
-  (map gen-metaconstant-sym metaconstants))
-
 (defn parse-metaconstants
+  "Takes a form and returns a map of unique metaconstants in the form mapped to bindable names generated for each."
   [form]
   (let [metaconstants (pre-parse-metaconstants form)
-        swapped (gen-metaconstant-syms metaconstants)]
+        swapped (map gen-metaconstant-sym metaconstants)]
     (zipmap metaconstants swapped)))
 
 (defn- replace-metaconstant
@@ -187,6 +188,8 @@
     form))
 
 (defn- ^{:testable true} replace-metaconstants
+  "Takes a metaconstant->symbol look-up map and a variably nested form. Returns the form with metaconstant values
+   replaced by the values in the look-up map."
   [mc-lookup form]
   (if-not (seq? form)
     (replace-metaconstant mc-lookup form)
