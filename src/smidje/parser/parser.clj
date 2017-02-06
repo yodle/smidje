@@ -161,7 +161,6 @@
   (->> (vector form)
        (flatten)
        (filter metaconstant?)
-       (map keyword)
        (distinct)))
 
 (defn- gen-metaconstant-sym [mc]
@@ -184,7 +183,7 @@
 (defn- replace-metaconstant
   [mc-lookup form]
   (if (metaconstant? form)
-    (get mc-lookup (keyword (name form)))
+    (get mc-lookup form)
     form))
 
 (defn- ^{:testable true} replace-metaconstants
@@ -238,4 +237,4 @@
         adjusted-forms (replace-metaconstants metaconstants fact-forms)]
     (-> {:tests [{:name       name
                   :assertions (parse adjusted-forms)
-                  :metaconstants metaconstants}]})))
+                  :metaconstants (clojure.set/map-invert metaconstants)}]})))
