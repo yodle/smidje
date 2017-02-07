@@ -97,9 +97,9 @@
    (->> (map
           (fn [metaconstant]
             [metaconstant
-             `(fn [])])
+             (name metaconstant)])
           (keys metaconostants))
-        (flatten)
+        (reduce concat)
         (into [])))
 
 (defn generate-test [test-definition]

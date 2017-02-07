@@ -63,7 +63,7 @@
     (--func-- ..test..) => 1))
 
 (fact
-  "return metaconstant in provided"
-  (thing 1) => ..thingresult..
+  "metaconstant not equal"
+  (thing 1) =not=> ..result..
   (provided
-    (thing 1) => ..result..))
+    (thing 1) => ..badresult..))
