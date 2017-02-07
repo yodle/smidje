@@ -67,16 +67,19 @@
     :else (generate-single-assert assertion)))
 
 (defn list-contains? [list object]
-  (some #(= object %) list))
+  (if (empty? list)
+    false
+    (some #(= object %) list)))
 
 (defn parse-metaconstant-functions [metaconstants mock-map]
-  (into
-    {}
-    (filter
-      (fn [[keystring :as mock]]
-        (when (list-contains? metaconstants (keyword keystring))
-          mock))
-      mock-map)))
+  (let [metaconstant-list (keys metaconstants)]
+    (into
+      {}
+      (filter
+        (fn [[keystring :as mock]]
+          (when (list-contains? metaconstant-list (symbol keystring))
+            mock))
+        mock-map))))
 
 (defn generate-wrapped-assertion [metaconstants assertion]
   (let [{provided# :provided} assertion
@@ -93,9 +96,9 @@
 (defn generate-metaconstant-bindings [metaconostants]
    (->> (map
           (fn [metaconstant]
-            [(symbol (name metaconstant))
+            [metaconstant
              `(fn [])])
-          metaconostants)
+          (keys metaconostants))
         (flatten)
         (into [])))
 

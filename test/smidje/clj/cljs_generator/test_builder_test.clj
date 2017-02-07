@@ -48,13 +48,38 @@
     "parse-metaconstant-functions"
     (fact
       "no metaconstants returns empty map"
-      (let [mock-map {:func1 :mock1
-                      :func2 :mock2}]
+      (let [mock-map {"func1" :mock1
+                      "func2" :mock2}]
         (parse-metaconstant-functions [] mock-map) => {}))
 
     (fact
       "only metaconstants returned"
-      (let [metaconstants [:func1]
-            mock-map {:func1 :mock1
-                      :func2 :mock2}]
-        (parse-metaconstant-functions metaconstants mock-map) => {:func1 :mock1}))))
+      (let [metaconstants {'func1 '--meta--}
+            mock-map {"func1" :mock1
+                      "func2" :mock2}]
+        (parse-metaconstant-functions metaconstants mock-map) => {"func1" :mock1})))
+
+  (defn validate-binding [[actual-symbol binding][expected-symbol _]]
+    (and (= actual-symbol expected-symbol)
+         (fn? binding)))
+
+  (defn validate-metaconstant-bindings [metaconstants bindings]
+    (let [binding-list (partition 2 bindings)]
+      (and (reduce = true (map validate-binding binding-list metaconstants))
+           (even? (count bindings)))))
+
+  (fact
+    "generate-metaconstant-bindings creates valid bindings"
+    (let [metaconstants {'binding1 '..symbol..
+                         'binding2 '--symbol--}]
+      (generate-metaconstant-bindings metaconstants) => (partial validate-metaconstant-bindings metaconstants))))
+
+(tabular
+  (fact
+    "list-contains returns correct results"
+    (list-contains? ?list ?object) => ?result)
+  ?list     ?object       ?result
+  []        1             falsey
+  [1 2]     1             truthy
+  [1 2]     5             falsey
+  nil       2             falsey)

@@ -54,10 +54,16 @@
 
 (fact
   "meta constant"
-  (#(identity %) --test--) => --test--)
+  (#(identity %) ..test..) => ..test..)
 
 (fact
   "meta constant function"
-  (#(--func-- %) --test--) => 1
+  (#(--func-- %) ..test..) => 1
   (provided
-    (--func-- --test--) => 1))
+    (--func-- ..test..) => 1))
+
+(fact
+  "return metaconstant in provided"
+  (thing 1) => ..thingresult..
+  (provided
+    (thing 1) => ..result..))
