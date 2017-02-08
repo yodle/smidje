@@ -71,7 +71,7 @@
     false
     (some #(= object %) list)))
 
-(defn parse-metaconstant-functions [metaconstants mock-map]
+(defn extract-metaconstant-mocks [metaconstants mock-map]
   (let [metaconstant-list (keys metaconstants)]
     (into
       {}
@@ -85,7 +85,7 @@
   (let [{provided# :provided} assertion
         complete-mock-map (generate-mock-map provided#)
         mocks-atom (gensym "mocks-atom")
-        unbound-mocks (parse-metaconstant-functions metaconstants complete-mock-map)
+        unbound-mocks (extract-metaconstant-mocks metaconstants complete-mock-map)
         bound-mocks (apply dissoc complete-mock-map (keys unbound-mocks))]
     `(let ~(into [] (concat [mocks-atom `(atom ~complete-mock-map)]
                             (generate-mock-bindings unbound-mocks mocks-atom)))
@@ -93,12 +93,12 @@
          ~(generate-assertion assertion)
           (smidje.core/validate-mocks ~mocks-atom)))))
 
-(defn generate-metaconstant-bindings [metaconostants]
+(defn generate-metaconstant-bindings [metaconstants]
    (->> (map
           (fn [metaconstant]
             [metaconstant
              (name metaconstant)])
-          (keys metaconostants))
+          (keys metaconstants))
         (reduce concat)
         (into [])))
 

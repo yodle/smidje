@@ -50,22 +50,21 @@
       "no metaconstants returns empty map"
       (let [mock-map {"func1" :mock1
                       "func2" :mock2}]
-        (parse-metaconstant-functions [] mock-map) => {}))
+        (extract-metaconstant-mocks [] mock-map) => {}))
 
     (fact
       "only metaconstants returned"
       (let [metaconstants {'func1 '--meta--}
             mock-map {"func1" :mock1
                       "func2" :mock2}]
-        (parse-metaconstant-functions metaconstants mock-map) => {"func1" :mock1})))
+        (extract-metaconstant-mocks metaconstants mock-map) => {"func1" :mock1})))
 
   (defn validate-binding [[actual-symbol binding][expected-symbol _]]
-    (and (= actual-symbol expected-symbol)
-         (fn? binding)))
+    (= [expected-symbol (name expected-symbol)] [actual-symbol (name actual-symbol)]))
 
   (defn validate-metaconstant-bindings [metaconstants bindings]
     (let [binding-list (partition 2 bindings)]
-      (and (reduce = true (map validate-binding binding-list metaconstants))
+      (and (every? true? (map validate-binding binding-list metaconstants))
            (even? (count bindings)))))
 
   (fact
