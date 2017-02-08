@@ -1,6 +1,6 @@
 (ns smidje.cljs.macro-test
-  (:require-macros [cljs.test :refer [deftest is]]
-                   [smidje.core :refer [fact tabular]]))
+  (:require [smidje.core :refer-macros [fact tabular]])
+  (:require-macros [cljs.test :refer [deftest is]]))
 
 (enable-console-print!)
 
@@ -51,3 +51,19 @@
   "provided works with truth checks"
   (bar) => truthy
   (bar) => falsey (provided (bar) => nil))
+
+(fact
+  "meta constant"
+  (#(identity %) ..test..) => ..test..)
+
+(fact
+  "meta constant function"
+  (#(--func-- %) ..test..) => 1
+  (provided
+    (--func-- ..test..) => 1))
+
+(fact
+  "metaconstant not equal"
+  (thing 1) =not=> ..result..
+  (provided
+    (thing 1) => ..badresult..))

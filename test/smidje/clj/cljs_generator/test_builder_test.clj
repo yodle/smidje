@@ -42,4 +42,43 @@
     ?arrow ?expected
     '=> '=
     '=not=> 'not=
-    '=bogus=> (throws Exception)))
+    '=bogus=> (throws Exception))
+
+  (facts
+    "parse-metaconstant-functions"
+    (fact
+      "no metaconstants returns empty map"
+      (let [mock-map {"func1" :mock1
+                      "func2" :mock2}]
+        (extract-metaconstant-mocks [] mock-map) => {}))
+
+    (fact
+      "only metaconstants returned"
+      (let [metaconstants {'func1 '--meta--}
+            mock-map {"func1" :mock1
+                      "func2" :mock2}]
+        (extract-metaconstant-mocks metaconstants mock-map) => {"func1" :mock1})))
+
+  (defn validate-binding [[actual-symbol binding][expected-symbol _]]
+    (= [expected-symbol (name expected-symbol)] [actual-symbol (name actual-symbol)]))
+
+  (defn validate-metaconstant-bindings [metaconstants bindings]
+    (let [binding-list (partition 2 bindings)]
+      (and (every? true? (map validate-binding binding-list metaconstants))
+           (even? (count bindings)))))
+
+  (fact
+    "generate-metaconstant-bindings creates valid bindings"
+    (let [metaconstants {'binding1 '..symbol..
+                         'binding2 '--symbol--}]
+      (generate-metaconstant-bindings metaconstants) => (partial validate-metaconstant-bindings metaconstants))))
+
+(tabular
+  (fact
+    "list-contains returns correct results"
+    (list-contains? ?list ?object) => ?result)
+  ?list     ?object       ?result
+  []        1             falsey
+  [1 2]     1             truthy
+  [1 2]     5             falsey
+  nil       2             falsey)

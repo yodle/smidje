@@ -1,7 +1,6 @@
 (ns smidje.cljs-generator.test-builder
   (:require [smidje.parser.arrows :refer [arrow-set]]
             [smidje.parser.checkers :refer [truthy falsey TRUTHY FALSEY truth-set]]
-            [smidje.cljs-generator.mocks :refer [generate-mock-function]]
             [smidje.cljs-generator.cljs-syntax-converter :refer [clj->cljs]]
             [clojure.test :refer [deftest is]]))
 
@@ -25,8 +24,8 @@
 (defn generate-mock-binding [mocks-atom]
   (fn [mock-data-map]
     (let [[function-key {function :function}] mock-data-map
-          mock-function (generate-mock-function function-key mocks-atom)]
-      [function mock-function])))
+          mock-function-template `(smidje.core/generate-mock-function ~function-key ~mocks-atom)]
+      [function mock-function-template])))
 
 (defn generate-mock-bindings [provided mocks-atom]
   (into [] (reduce concat (map (generate-mock-binding mocks-atom) provided))))
@@ -67,38 +66,51 @@
     (:throws-exception assertion) (generate-expected-exception assertion)
     :else (generate-single-assert assertion)))
 
-(defn validate-no-unexpected-calls [function-variable-name mock-info-variable-name]
-  `(doseq [actual-call-param# (keys (:calls ~mock-info-variable-name))]
-     (is
-       (contains? (:mock-config ~mock-info-variable-name) actual-call-param#)
-       (str ~function-variable-name " called with unexpected args " actual-call-param#))))
+(defn list-contains? [list object]
+  (if (empty? list)
+    false
+    (some #(= object %) list)))
 
-(defn validate-mock-called-with-expected-args [function-variable-name mock-info-variable-name]
-  `(doseq [expected-call-param# (keys (:mock-config ~mock-info-variable-name))]
-     (is (>= (or (get (:calls ~mock-info-variable-name) expected-call-param#) 0) 1)
-         (str ~function-variable-name " expected to be called with " expected-call-param# " but never invoked"))))
+(defn extract-metaconstant-mocks [metaconstants mock-map]
+  (let [metaconstant-list (keys metaconstants)]
+    (into
+      {}
+      (filter
+        (fn [[keystring :as mock]]
+          (when (list-contains? metaconstant-list (symbol keystring))
+            mock))
+        mock-map))))
 
-(defn generate-mock-validation [mocks-atom-name]
-  (let [function-var-name (gensym "mock-function")
-        mock-info-var-name (gensym "mock-info")]
-    `(doseq [[~function-var-name ~mock-info-var-name] (deref ~mocks-atom-name)]
-       ~(validate-mock-called-with-expected-args function-var-name mock-info-var-name)
-       ~(validate-no-unexpected-calls function-var-name mock-info-var-name))))
-
-(defn generate-wrapped-assertion [assertion]
+(defn generate-wrapped-assertion [metaconstants assertion]
   (let [{provided# :provided} assertion
-        mock-map# (generate-mock-map provided#)
-        mocks-atom (gensym)]
-    `(let [~mocks-atom (atom ~mock-map#)]
-       (with-redefs ~(generate-mock-bindings mock-map# mocks-atom)
+        complete-mock-map (generate-mock-map provided#)
+        mocks-atom (gensym "mocks-atom")
+        unbound-mocks (extract-metaconstant-mocks metaconstants complete-mock-map)
+        bound-mocks (apply dissoc complete-mock-map (keys unbound-mocks))]
+    `(let ~(into [] (concat [mocks-atom `(atom ~complete-mock-map)]
+                            (generate-mock-bindings unbound-mocks mocks-atom)))
+       (with-redefs ~(generate-mock-bindings bound-mocks mocks-atom)
          ~(generate-assertion assertion)
-         ~(generate-mock-validation mocks-atom)))))
+          (smidje.core/validate-mocks ~mocks-atom)))))
+
+(defn generate-metaconstant-bindings [metaconstants]
+   (->> (map
+          (fn [metaconstant]
+            [metaconstant
+             (name metaconstant)])
+          (keys metaconstants))
+        (reduce concat)
+        (into [])))
 
 (defn generate-test [test-definition]
-  (let [assertions# (:assertions test-definition)
-        name# (:name test-definition)]
+  (let [{assertions# :assertions
+         name# :name
+         metaconstants# :metaconstants} test-definition]
     `(deftest ~(symbol name#)
-       ~@(map generate-wrapped-assertion assertions#))))
+       (let ~(generate-metaconstant-bindings metaconstants#)
+         ~@(map
+             (partial generate-wrapped-assertion metaconstants#)
+             assertions#)))))
 
 (defn generate-tests [test-runtime]
   (let [tests# (:tests test-runtime)]

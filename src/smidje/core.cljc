@@ -1,6 +1,7 @@
 (ns smidje.core
-  (:require [smidje.cljs-generator.test-builder :as cljs-builder]
-            [smidje.parser.parser :as parser]))
+  (:require #?(:clj [smidje.cljs-generator.test-builder :as cljs-builder])
+            #?(:clj [smidje.parser.parser :as parser])
+            [smidje.cljs-generator.mocks :as mocks]))
 
 (defmacro fact [& args]
   (-> (parser/parse-fact &form)
@@ -8,6 +9,14 @@
 
 (defmacro tabular [& _]
   (parser/tabular* &form))
+
+;------functions exposed for use by generated code-------
+
+(defn generate-mock-function [function-key mocks-atom]
+  (mocks/generate-mock-function function-key mocks-atom))
+
+(defn validate-mocks [mocks-atom]
+  (mocks/validate-mocks mocks-atom))
 
 (comment
   (macroexpand
