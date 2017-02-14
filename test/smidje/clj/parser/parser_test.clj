@@ -63,11 +63,11 @@
 (m/fact "build-provided-map"
         (#'smidje.parser.parser/build-provided-map simple-addition-fact) => {:mock-function '+
                                                                       :paramaters '(1 1)
-                                                                      :arrow '=>
+                                                                      :arrow :=>
                                                                       :result 2}
         (#'smidje.parser.parser/build-provided-map '((add 2 3) => 5 :times 1 :except 4)) => {:mock-function 'add
                                                                                       :paramaters '(2 3)
-                                                                                      :arrow '=>
+                                                                                      :arrow :=>
                                                                                       :result 5
                                                                                       :times 1
                                                                                       :except 4})

@@ -69,7 +69,7 @@
     (thing 1) => ..badresult..))
 
 (fact
-  "expects exception when thrown"
+  "expects exception when thrown by provided"
   (bar) => (throws js/Error)
   (provided
     (bar) =throws=> (js/Error)))

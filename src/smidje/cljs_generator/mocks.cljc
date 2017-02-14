@@ -4,8 +4,9 @@
 (defn return-or-throw [{:keys [arrow result] :as m}]
     (cond
       (= arrow :=>) result
-      (= arrow :=throws=>) (throw result))
-  result)
+      (= arrow :=throws=>) (throw result)
+      :else #?(:clj (throw (Exception. "unknown arrow in provided"))
+               :cljs (throw (js/Error "unknown arrow in provided")))))
 
 (defn generate-mock-function
   "generates a mock given a mock-config-atom object of the form
