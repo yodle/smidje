@@ -82,3 +82,7 @@
   [1 2]     1             truthy
   [1 2]     5             falsey
   nil       2             falsey)
+
+(fact
+  "empty assertions results in print"
+  (generate-test {:assertions [] :name ..test-name..}) => `(print "warning:" ..test-name.. "does not have any assertions and will be ignored"))
