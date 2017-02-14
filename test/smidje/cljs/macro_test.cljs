@@ -67,3 +67,9 @@
   (thing 1) =not=> ..result..
   (provided
     (thing 1) => ..badresult..))
+
+(fact
+  "expects exception when thrown"
+  (bar) => (throws js/Error)
+  (provided
+    (bar) =throws=> (js/Error)))
