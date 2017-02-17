@@ -67,4 +67,10 @@
   (provided
     (thing 1) => ..badresult..))
 
+(fact
+  "expects exception when thrown by provided"
+  (bar) => (throws js/Error)
+  (provided
+    (bar) =throws=> (js/Error)))
+
 (fact "expected empty fact warning")

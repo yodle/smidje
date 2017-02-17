@@ -1,6 +1,13 @@
 (ns smidje.cljs-generator.mocks
   (:require [clojure.test :refer [is]]))
 
+(defn return-or-throw [{:keys [arrow result] :as m}]
+    (cond
+      (= arrow :=>) result
+      (= arrow :=throws=>) (throw result)
+      :else #?(:clj (throw (Exception. "unknown arrow in provided"))
+               :cljs (throw (js/Error "unknown arrow in provided")))))
+
 (defn generate-mock-function
   "generates a mock given a mock-config-atom object of the form
   {<function-key>
@@ -14,7 +21,7 @@
           clean-params (or params [])]
       (swap! mock-config-atom update-in [function-key :calls clean-params] (fnil inc 0))
       (when (contains? mock-config clean-params)
-        (get-in mock-config [clean-params :result])))))
+        (return-or-throw (get mock-config clean-params))))))
 
 (defn validate-no-unexpected-calls [function mock-info]
   (doseq [actual-call-param (keys (:calls mock-info))]

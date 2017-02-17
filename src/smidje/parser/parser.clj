@@ -70,7 +70,7 @@
    (apply hash-map (drop 3 provided))
    {:mock-function (first (first provided))
     :paramaters (into [] (rest (first provided)))
-    :arrow (second provided)
+    :arrow (keyword (second provided))
     :result (nth provided 2)}))
 
 (defn- parse-provided

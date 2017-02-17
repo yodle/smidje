@@ -15,7 +15,8 @@
     (let [function 'func
           mock-atom (atom {function
                            {:mock-config
-                            {[] {:result 1}}}})]
+                            {[] {:result 1
+                                 :arrow :=>}}}})]
       ((generate-mock-function function mock-atom)) => 1
       (get-in @mock-atom [function :calls []]) => 1))
 
@@ -24,11 +25,24 @@
     (let [function 'func
           mock-atom (atom {function
                            {:mock-config
-                            {[] {:result 1}}
+                            {[] {:result 1
+                                 :arrow :=>}}
                             :calls
                             {[1] 1}}})]
       ((generate-mock-function function mock-atom) 1) => nil
-      (get-in @mock-atom [function :calls [1]]) => 2)))
+      (get-in @mock-atom [function :calls [1]]) => 2))
+
+  (fact
+    "calls return or throws"
+    (let [function 'func
+          mock-atom (atom {function
+                           {:mock-config
+                            {[1] {:result 1
+                                  :arrow  :=>}}}})]
+      ((generate-mock-function function mock-atom) 1) => ..result..
+      (provided
+        (return-or-throw {:result 1
+                          :arrow  :=>}) => ..result.. :times 1))))
 
 (facts
   "mock validation"
@@ -88,3 +102,18 @@
       (validate-no-unexpected-calls function mock-config) => anything
       (provided
         (do-report (as-checker #(= :fail (:type %)))) => nil :times 1))))
+
+(facts
+  "return or throw"
+
+  (fact
+    "returns result"
+    (return-or-throw {:arrow :=> :result ..result..}) => ..result..)
+
+  (fact
+    "throws exception"
+    (return-or-throw {:arrow :=throws=> :result (Exception. "my exception")}) => (throws Exception "my exception"))
+
+  (fact
+    "throws exception on unknown arrow"
+    (return-or-throw {:arrow :fake :result ..result..}) => (throws Exception "unknown arrow in provided")))
