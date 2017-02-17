@@ -38,7 +38,7 @@
           mock-atom (atom {function
                            {:mock-config
                             {[1] {:result 1
-                                 :arrow  :=>}}}})]
+                                  :arrow  :=>}}}})]
       ((generate-mock-function function mock-atom) 1) => ..result..
       (provided
         (return-or-throw {:result 1
@@ -105,12 +105,15 @@
 
 (facts
   "return or throw"
+
   (fact
     "returns result"
     (return-or-throw {:arrow :=> :result ..result..}) => ..result..)
+
   (fact
     "throws exception"
     (return-or-throw {:arrow :=throws=> :result (Exception. "my exception")}) => (throws Exception "my exception"))
+
   (fact
     "throws exception on unknown arrow"
     (return-or-throw {:arrow :fake :result ..result..}) => (throws Exception "unknown arrow in provided")))
