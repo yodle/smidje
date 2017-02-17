@@ -1,5 +1,5 @@
 (ns smidje.cljs.macro-test
-  (:require [smidje.core :refer-macros [fact tabular]]))
+  (:require [smidje.core :refer-macros [fact tabular] :as core]))
 
 (enable-console-print!)
 
@@ -11,6 +11,9 @@
 
 (defn foo []
   (+ (bar) (thing 1)))
+
+(defn anything [a b]
+  (- a b))
 
 (fact "multi-provided"
       (foo) => 2
@@ -74,3 +77,13 @@
     (bar) =throws=> (js/Error)))
 
 (fact "expected empty fact warning")
+
+(fact "test-anything provided"
+      (anything 1 2) => 2
+      (provided
+        (anything core/anything 2) => 2))
+
+(fact "test-anything returned"
+      (anything 1 2) => core/anything
+      (provided
+        (anything 1 2) => nil))

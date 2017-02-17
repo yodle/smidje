@@ -2,7 +2,11 @@
   (:require #?(:clj [smidje.cljs-generator.test-builder :as cljs-builder])
             #?(:clj [smidje.parser.parser :as parser])
             #?(:cljs [cljs.test :refer-macros [deftest is]])
-            [smidje.cljs-generator.mocks :as mocks]))
+            [smidje.cljs-generator.mocks :as mocks]
+            [smidje.symbols :as symbols]))
+
+;Namespaced symbols to differentiate between smidje syntax and user variables
+(def anything symbols/anything)
 
 (defmacro fact [& args]
   (-> (parser/parse-fact &form)
