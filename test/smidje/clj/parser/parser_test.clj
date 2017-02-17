@@ -12,13 +12,13 @@
   '((+ 1 1) => 2))
 
 (m/fact "simple addition"
-        (parser/parse simple-addition-fact) => [im/simple-successful-addition-assertion])
+        (parser/parse-assertions simple-addition-fact) => [im/simple-successful-addition-assertion])
 
 (def simple-addition-unequal-fact
   '((+ 1 1) =not=> 3))
 
 (m/fact "simple addition unequal"
-        (parser/parse simple-addition-unequal-fact) => [im/simple-addition-successful-not-assertion])
+        (parser/parse-assertions simple-addition-unequal-fact) => [im/simple-addition-successful-not-assertion])
 
 (m/fact "throws validator recognizes right hand expected exception"
   (throws-form? '(throws)) => true

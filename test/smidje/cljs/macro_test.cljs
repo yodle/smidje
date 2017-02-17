@@ -1,6 +1,5 @@
 (ns smidje.cljs.macro-test
-  (:require [smidje.core :refer-macros [fact tabular]])
-  (:require-macros [cljs.test :refer [deftest is]]))
+  (:require [smidje.core :refer-macros [fact tabular]]))
 
 (enable-console-print!)
 
@@ -73,3 +72,5 @@
   (bar) => (throws js/Error)
   (provided
     (bar) =throws=> (js/Error)))
+
+(fact "expected empty fact warning")

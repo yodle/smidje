@@ -134,7 +134,7 @@
       (parse-expected expected-form)
       (parse-provided forms))))
 
-(defn parse
+(defn parse-assertions
   [forms]
   (loop [result []
          input forms]
@@ -239,5 +239,5 @@
         metaconstants (parse-metaconstants fact-forms)
         adjusted-forms (replace-metaconstants metaconstants fact-forms)]
     (-> {:tests [{:name       name
-                  :assertions (parse adjusted-forms)
+                  :assertions (parse-assertions adjusted-forms)
                   :metaconstants (clojure.set/map-invert metaconstants)}]})))
