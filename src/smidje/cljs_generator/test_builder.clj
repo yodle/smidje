@@ -102,15 +102,16 @@
         (reduce concat)
         (into [])))
 
-(defn generate-test [test-definition]
-  (let [{assertions# :assertions
-         name# :name
-         metaconstants# :metaconstants} test-definition]
-    `(deftest ~(symbol name#)
-       (let ~(generate-metaconstant-bindings metaconstants#)
-         ~@(map
-             (partial generate-wrapped-assertion metaconstants#)
-             assertions#)))))
+(defn generate-test [{assertions# :assertions
+                      name# :name
+                      metaconstants# :metaconstants}]
+  (cond
+    (empty? assertions#) `(print "warning:" ~name# "does not have any assertions and will be ignored")
+    :else `(deftest ~(symbol name#)
+             (let ~(generate-metaconstant-bindings metaconstants#)
+               ~@(map
+                   (partial generate-wrapped-assertion metaconstants#)
+                   assertions#)))))
 
 (defn generate-tests [test-runtime]
   (let [tests# (:tests test-runtime)]

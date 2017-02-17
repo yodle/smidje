@@ -1,6 +1,7 @@
 (ns smidje.core
   (:require #?(:clj [smidje.cljs-generator.test-builder :as cljs-builder])
             #?(:clj [smidje.parser.parser :as parser])
+            #?(:cljs [cljs.test :refer-macros [deftest is]])
             [smidje.cljs-generator.mocks :as mocks]))
 
 (defmacro fact [& args]
