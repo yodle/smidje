@@ -74,9 +74,9 @@
            (> (count input) 1)
            (list? (second input))
            (= (first (second input)) 'range))
-      (recur
-        (conj result (first input) (replace-range (second input)))
-        (drop 2 input))
+        (recur
+          (conj result (first input) (replace-range (second input)))
+          (drop 2 input))
       :else (recur
               (conj result (first input))
               (rest input)))))
