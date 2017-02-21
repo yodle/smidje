@@ -44,18 +44,61 @@
       [provided]
       )))
 
-(defn- seperate-provided-forms
+(defn- provided-expression?
   [forms]
-  (loop [result [] current-form (into []  (take 3 forms)) input (drop 3 forms)]
+  (and (>= (count forms) 3)
+       (list? (first forms))
+       (is-arrow (second forms))))
+
+(defn- range?
+  [form]
+  (and (list? form)
+       (= (first form) 'range)))
+
+(defn- parse-range
+  ; TODO: validate range indexes
+  [form]
+  (let [length (count form)]
     (cond
-      (empty? input) (conj result current-form)
+      (= length 1) :optional
+      (= length 2) {:range [0 (second form)]}
+      :else {:range [(nth form 1) (nth form 2)]})))
 
-      (and (> (count input) 2)
-           (list? (first input))
-           (is-arrow (second input)))
-        (recur (conj result current-form) (into []  (take 3 input)) (drop 3 input))
+(defn- separate-provided-forms
+  "Takes a list like:
 
-      :else (recur result (conj current-form (first input)) (rest input)))))
+   ((foo \"bar\") => 5
+    (oh \"dang\") => 3 :times 3)
+
+   and splits it up into a vector of multiple lists, where each list represents one provided expression:
+
+   [((foo \"bar\") => 5), ((oh \"dang\") => 3 :times 3)]"
+  [forms]
+  (loop [result []
+         input forms]
+    (cond
+      (empty? input)
+        result
+      (and (provided-expression? input)
+           (>= (count input) 5)
+           (= (nth input 3) :times))
+        ; Ideally we wouldn't have to explicitly parse for range, but this gets us there for now.
+        (let [times-arg (nth input 4)]
+          (if (range? times-arg)
+            (recur
+              (conj result (concat (take 4 input) [(parse-range times-arg)]))
+              (drop 5 input))
+            (recur
+              (conj result (take 5 input))
+              (drop 5 input))))
+      (provided-expression? forms)
+        (recur
+          (conj result (take 3 input))
+          (drop 3 input))
+      :else
+        (recur
+          (conj result (first input))
+          (rest input)))))
 
 (defn- aggregate-paramater-maps
   [paramater-maps]
@@ -78,7 +121,7 @@
   (if (has-provided-form? forms)
     {:provided (->> (nth forms 3)
                     rest
-                    seperate-provided-forms
+                    separate-provided-forms
                     (mapcat unnest-provided)
                     (map build-provided-map)
                     (group-by :mock-function)
