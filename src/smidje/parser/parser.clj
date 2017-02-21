@@ -1,8 +1,7 @@
 (ns smidje.parser.parser
   (:require [smidje.parser.arrows :refer [arrow-set]]
             [clojure.walk :refer [prewalk]]
-            [smidje.parser.checkers :refer [throws truthy TRUTHY falsey FALSEY]])
-  (:import (java.text ParseException)))
+            [smidje.parser.checkers :refer [throws truthy TRUTHY falsey FALSEY]]))
 
 (def provided "provided")
 
