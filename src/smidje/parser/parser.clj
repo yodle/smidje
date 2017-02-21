@@ -1,7 +1,8 @@
 (ns smidje.parser.parser
   (:require [smidje.parser.arrows :refer [arrow-set]]
             [clojure.walk :refer [prewalk]]
-            [smidje.parser.checkers :refer [throws truthy TRUTHY falsey FALSEY]]))
+            [smidje.parser.checkers :refer [throws truthy TRUTHY falsey FALSEY]])
+  (:import (java.text ParseException)))
 
 (def provided "provided")
 
@@ -44,9 +45,9 @@
       [provided]
       )))
 
-(defn- seperate-provided-forms
+(defn- separate-provided-forms
   [forms]
-  (loop [result [] current-form (into []  (take 3 forms)) input (drop 3 forms)]
+  (loop [result [] current-form (into [] (take 3 forms)) input (drop 3 forms)]
     (cond
       (empty? input) (conj result current-form)
 
@@ -56,6 +57,30 @@
         (recur (conj result current-form) (into []  (take 3 input)) (drop 3 input))
 
       :else (recur result (conj current-form (first input)) (rest input)))))
+
+(defn- replace-range
+  [form]
+  (condp = (count form)
+    1 :optional
+    2 {:range [0 (second form)]}
+    3 {:range [(nth form 1) (nth form 2)]}
+    (throw (RuntimeException. "invalid (range) form: more than two arguments"))))
+
+(defn- adjust-range
+  [form]
+  (loop [result [] input form]
+    (cond
+      (empty? input) result
+      (and (= (first input) :times)
+           (> (count input) 1)
+           (list? (second input))
+           (= (first (second input)) 'range))
+      (recur
+        (conj result (first input) (replace-range (second input)))
+        (drop 2 input))
+      :else (recur
+              (conj result (first input))
+              (rest input)))))
 
 (defn- aggregate-paramater-maps
   [paramater-maps]
@@ -78,7 +103,8 @@
   (if (has-provided-form? forms)
     {:provided (->> (nth forms 3)
                     rest
-                    seperate-provided-forms
+                    separate-provided-forms
+                    (map adjust-range)
                     (mapcat unnest-provided)
                     (map build-provided-map)
                     (group-by :mock-function)

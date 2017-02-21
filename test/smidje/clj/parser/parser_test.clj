@@ -53,9 +53,9 @@
                 '((c 4) => ..b->c02..)}
             (m/provided (gensym "a->b") m/=> 'a->b01 (gensym "b->c") m/=> 'b->c02))
 
-(m/fact "seperate-provided-forms"
-        (#'smidje.parser.parser/seperate-provided-forms simple-addition-fact) => [simple-addition-fact]
-        (set  (#'smidje.parser.parser/seperate-provided-forms
+(m/fact "separate-provided-forms"
+        (#'smidje.parser.parser/separate-provided-forms simple-addition-fact) => [simple-addition-fact]
+        (set  (#'smidje.parser.parser/separate-provided-forms
                '((+ 1 1) => 2 :times 1 (* 2 3) => 6 :times 2 :except 3 (/ 4 2) => 2))) => '#{((+ 1 1) => 2 :times 1)
                                                                                       ((/ 4 2) => 2)
                                                                                      ((* 2 3) => 6 :times 2 :except 3)})
