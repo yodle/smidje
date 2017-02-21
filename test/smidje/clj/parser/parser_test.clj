@@ -60,6 +60,13 @@
                                                                                       ((/ 4 2) => 2)
                                                                                      ((* 2 3) => 6 :times 2 :except 3)})
 
+(m/fact "adjust-range"
+        (adjust-range '((+ 1 1) => 2 :times 1 :except 3)) m/=> '((+ 1 1) => 2 :times 1 :except 3)
+        (adjust-range '((+ 1 1) => 2 :times (range) :except 3)) m/=> '((+ 1 1) => 2 :times :optional :except 3)
+        (adjust-range '((+ 1 1) => 2 :times (range 3) :except 3)) m/=> '((+ 1 1) => 2 :times {:range [0 3]} :except 3)
+        (adjust-range '((+ 1 1) => 2 :times (range 2 10) :except 3)) m/=> '((+ 1 1) => 2 :times {:range [2 10]} :except 3)
+        (adjust-range '((+ 1 1) => 2 :times (range 1 2 3))) m/=> (m/throws RuntimeException #"more than two arguments"))
+
 (m/fact "build-provided-map"
         (#'smidje.parser.parser/build-provided-map simple-addition-fact) => {:mock-function '+
                                                                       :paramaters '(1 1)

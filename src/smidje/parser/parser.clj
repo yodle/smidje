@@ -65,7 +65,7 @@
     3 {:range [(nth form 1) (nth form 2)]}
     (throw (RuntimeException. "invalid (range) form: more than two arguments"))))
 
-(defn- adjust-range
+(defn- ^{:testable true} adjust-range
   [form]
   (loop [result [] input form]
     (cond
