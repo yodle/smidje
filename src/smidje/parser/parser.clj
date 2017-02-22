@@ -59,11 +59,18 @@
 
 (defn- replace-range
   [form]
-  (condp = (count form)
-    1 :optional
-    2 {:range [0 (second form)]}
-    3 {:range [(nth form 1) (nth form 2)]}
-    (throw (RuntimeException. "invalid (range) form: more than two arguments"))))
+  (let [[_ x1 x2] form]
+    (condp = (count form)
+      1 :optional
+      2 (if (< x1 1)
+          (throw (RuntimeException. (str "invalid (range) argument: " x1 ", must be greater than 0")))
+          {:range [1 x1]})
+      3 (cond
+          (< x1 1) (throw (RuntimeException. (str "invalid (range) argument: " x1 " must be greater than 0")))
+          (< x2 1) (throw (RuntimeException. (str "invalid (range) argument: " x2 " must be greater than 0")))
+          (> x1 x2) (throw (RuntimeException. (str "invalid (range) argument: " x1 " must be less than or equal to " x2)))
+          :else {:range [x1 x2]})
+      (throw (RuntimeException. "invalid (range) form: more than two arguments")))))
 
 (defn- ^{:testable true} adjust-range
   [form]
