@@ -44,18 +44,17 @@
           (= times-info :optional) nil
           ; exact call count specified
           (integer? times-info)
-            (is (= times-called times-info)
-                (str function-string " expected to be called " times-info " times; was called " times-called " times"))
+          (is (= times-called times-info)
+              (str function-string " expected to be called " times-info " times; was called " times-called " times"))
           ; range of acceptable values specified
           (contains? times-info :range)
-            (let [[min max] (:range times-info)
-                  error (str function-string " expected to be called "
-                             min " to " max " times, was called " times-called " time(s)")]
-              (is (>= times-called min) error)
-              (is (<= times-called max) error))
-          ; shouldn't get here, but just in case
+          (let [[min max] (:range times-info)]
+            (is (<= min times-called max)
+                (str function-string " expected to be called "
+                     min " to " max " times, was called " times-called " time(s)")))
+            ; shouldn't get here, but just in case
           :else
-            (throw (RuntimeException. "unsupported use of :times in (provided)"))))))
+          (throw (RuntimeException. "unsupported use of :times in (provided)"))))))
 
 (defn validate-mocks [mocks-atom]
   (doseq [[function mock] @mocks-atom]

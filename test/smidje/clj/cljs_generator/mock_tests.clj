@@ -110,22 +110,27 @@
                        :calls       {[] 5}}]
       (validate-mock-called-with-expected-args function mock-config) => anything
       (provided
-        (do-report (as-checker #(= :pass (:type %)))) => nil :times 2))
+        (do-report (as-checker #(= :pass (:type %)))) => nil :times 1))
     (let [function 'func
           mock-config {:mock-config {[] {:result ..foo.. :times {:range [2 7]}}},
                        :calls       {[] 7}}]
       (validate-mock-called-with-expected-args function mock-config) => anything
       (provided
-        (do-report (as-checker #(= :pass (:type %)))) => nil :times 2)))
+        (do-report (as-checker #(= :pass (:type %)))) => nil :times 1)))
 
   (fact
     "validate-mock-called-with-expected-args fails when indicated :times range calls made"
     (let [function 'func
           mock-config {:mock-config {[] {:result ..foo.. :times {:range [2 5]}}},
+                       :calls       {[] 1}}]
+      (validate-mock-called-with-expected-args function mock-config) => anything
+      (provided
+        (do-report (as-checker #(= :fail (:type %)))) => nil :times 1))
+    (let [function 'func
+          mock-config {:mock-config {[] {:result ..foo.. :times {:range [2 5]}}},
                        :calls       {[] 7}}]
       (validate-mock-called-with-expected-args function mock-config) => anything
       (provided
-        (do-report (as-checker #(= :pass (:type %)))) => nil :times 1
         (do-report (as-checker #(= :fail (:type %)))) => nil :times 1)))
 
   (fact
