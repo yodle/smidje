@@ -38,7 +38,7 @@
         (cond
           ; default with no :times defined: require one or more
           (nil? times-info)
-          (is (>= (or (get (:calls mock-info) expected-call-param) 0) 1)
+          (is (>= times-called 1)
               (str function-string " expected to be called, but never invoked"))
           ; optional number of times: no validation
           (= times-info :optional) nil
@@ -48,8 +48,7 @@
                 (str function-string " expected to be called " times-info " times; was called " times-called " times"))
           ; range of acceptable values specified
           (contains? times-info :range)
-            (let [min (first (:range times-info))
-                  max (second (:range times-info))
+            (let [[min max] (:range times-info)
                   error (str function-string " expected to be called "
                              min " to " max " times, was called " times-called " time(s)")]
               (is (>= times-called min) error)
