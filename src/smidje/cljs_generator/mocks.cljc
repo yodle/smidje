@@ -31,8 +31,8 @@
 (defn validate-mock-called-with-expected-args [function mock-info]
   (doseq [expected-call-param (keys (:mock-config mock-info))]
     (let [mock-config (:mock-config mock-info)
-          call-info (get mock-config (first (keys mock-config)))
           times-called (or (get (:calls mock-info) expected-call-param) 0)
+          call-info (get mock-config (first (keys mock-config)))
           function-string (str "(" function " " expected-call-param ")")]
       (if-let [times-info (:times call-info)]
         (cond
