@@ -32,7 +32,7 @@
   (doseq [expected-call-param (keys (:mock-config mock-info))]
     (let [mock-config (:mock-config mock-info)
           times-called (or (get (:calls mock-info) expected-call-param) 0)
-          call-info (get mock-config (first (keys mock-config)))
+          call-info (get mock-config expected-call-param)
           times-info (:times call-info)
           function-string (str "(" function " " expected-call-param ")")]
         (cond
