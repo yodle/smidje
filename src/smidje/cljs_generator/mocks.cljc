@@ -30,8 +30,31 @@
 
 (defn validate-mock-called-with-expected-args [function mock-info]
   (doseq [expected-call-param (keys (:mock-config mock-info))]
-    (is (>= (or (get (:calls mock-info) expected-call-param) 0) 1)
-        (str function " expected to be called with " expected-call-param " but never invoked"))))
+    (let [mock-config (:mock-config mock-info)
+          times-called (or (get (:calls mock-info) expected-call-param) 0)
+          call-info (get mock-config expected-call-param)
+          times-info (:times call-info)
+          function-string (str "(" function " " expected-call-param ")")]
+        (cond
+          ; default with no :times defined: require one or more
+          (nil? times-info)
+          (is (>= times-called 1)
+              (str function-string " expected to be called, but never invoked"))
+          ; optional number of times: no validation
+          (= times-info :optional) nil
+          ; exact call count specified
+          (integer? times-info)
+          (is (= times-called times-info)
+              (str function-string " expected to be called " times-info " times; was called " times-called " times"))
+          ; range of acceptable values specified
+          (contains? times-info :range)
+          (let [[min max] (:range times-info)]
+            (is (<= min times-called max)
+                (str function-string " expected to be called "
+                     min " to " max " times, was called " times-called " time(s)")))
+            ; shouldn't get here, but just in case
+          :else
+          (throw (RuntimeException. "unsupported use of :times in (provided)"))))))
 
 (defn validate-mocks [mocks-atom]
   (doseq [[function mock] @mocks-atom]
