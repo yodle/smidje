@@ -160,10 +160,11 @@
   "Returns a list of unique metaconstants symbols in the form.
    The form can be a single element or a variably-nested list."
   [form]
-  (->> (vector form)
-       (flatten)
-       (filter metaconstant?)
-       (distinct)))
+  (cond
+    (metaconstant? form) [form]
+    (coll? form) (filter identity (flatten (map pre-parse-metaconstants form)))
+    :else []))
+
 
 (defn- gen-metaconstant-sym
   "Generates a unique, bindable symbol for the metaconstant symbol."
@@ -191,9 +192,9 @@
   "Takes a metaconstant->symbol look-up map and a variably nested form. Returns the form with metaconstant values
    replaced by the values in the look-up map."
   [mc-lookup form]
-  (if-not (seq? form)
-    (replace-metaconstant mc-lookup form)
-    (clojure.walk/walk (partial replace-metaconstants mc-lookup) identity form)))
+  (if (coll? form)
+    (clojure.walk/walk (partial replace-metaconstants mc-lookup) identity form)
+    (replace-metaconstant mc-lookup form)))
 
 (defn- macro-name
        "Get name of target macro in form sequence"

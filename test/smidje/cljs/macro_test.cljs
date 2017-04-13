@@ -87,3 +87,12 @@
       (anything 1 2) => core/anything
       (provided
         (anything 1 2) => nil))
+
+(fact "test metaconstant in vector"
+      [..fact1..] =not=> [..fact2..])
+
+(fact "test metaconstant in map"
+      {:m ..fact1..} =not=> {:m ..fact2..})
+
+(fact "test metaconstant in list"
+      '(..fact1..) =not=> '(..fact2..))
