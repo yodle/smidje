@@ -1,11 +1,11 @@
 (ns smidje.cljs-generator.mocks
   (:require [clojure.test :refer [is]]
-            [smidje.symbols :refer [anything]]))
+            [smidje.symbols :refer [anything => =throws=>]]))
 
 (defn return-or-throw [{:keys [arrow result] :as m}]
     (cond
-      (= arrow :=>) result
-      (= arrow :=throws=>) (throw result)
+      (= arrow =>) result
+      (= arrow =throws=>) (throw result)
       :else #?(:clj (throw (Exception. "unknown arrow in provided"))
                :cljs (throw (js/Error "unknown arrow in provided")))))
 

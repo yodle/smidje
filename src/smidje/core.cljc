@@ -5,15 +5,19 @@
             [smidje.cljs-generator.mocks :as mocks]
             [smidje.symbols :as symbols]))
 
-;Namespaced symbols to differentiate between smidje syntax and user variables
-(def anything symbols/anything)
-
 (defmacro fact [& args]
+  (spit "./log" (str "env= " &env "\n") :append true)
   (-> (parser/parse-fact &form)
       cljs-builder/generate-tests))
 
 (defmacro tabular [& _]
   (parser/tabular* &form))
+
+;Namespaced symbols to differentiate between smidje syntax and user variables
+(def anything symbols/anything)
+(def => symbols/=>)
+(def =not=> symbols/=not=>)
+(def =throws=> symbols/=throws=>)
 
 ;------functions exposed for use by generated code-------
 

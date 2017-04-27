@@ -1,3 +1,11 @@
 (ns smidje.symbols)
 
-(def anything (gensym "anything"))
+(def anything ::anything)
+
+(def => ::=>)
+
+(def =not=> ::=not=>)
+
+(def =throws=> ::=throws=>)
+
+(def arrow-set [=> =not=>])

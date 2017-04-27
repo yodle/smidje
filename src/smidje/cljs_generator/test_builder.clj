@@ -1,14 +1,13 @@
 (ns smidje.cljs-generator.test-builder
-  (:require [smidje.parser.arrows :refer [arrow-set]]
-            [smidje.symbols :refer [anything]]
+  (:require [smidje.symbols :refer [anything arrow-set => =not=>]]
             [smidje.parser.checkers :refer [truthy falsey TRUTHY FALSEY truth-set]]
             [smidje.cljs-generator.cljs-syntax-converter :refer [clj->cljs]]
             [clojure.test :refer [deftest is]]))
 
 (defn do-arrow [arrow]
   (cond
-    (= arrow '=>) '=
-    (= arrow '=not=>) 'not=
+    (= arrow =>) '=
+    (= arrow =not=>) 'not=
     :else (throw (Exception. (format "Unknown arrow given: %s | Valid arrows: %s"
                                      arrow
                                      arrow-set)))))

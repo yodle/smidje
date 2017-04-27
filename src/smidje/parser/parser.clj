@@ -1,14 +1,22 @@
 (ns smidje.parser.parser
-  (:require [smidje.parser.arrows :refer [arrow-set]]
+  (:require [smidje.symbols :refer [=> =not=> arrow-set]]
             [clojure.walk :refer [prewalk]]
             [smidje.parser.checkers :refer [throws truthy TRUTHY falsey FALSEY]]))
 
 (def provided "provided")
 
+(defn- resolve-symbol [symbol]
+  (let [resolved-symbol (resolve 'smidje.core/=>)]
+    (spit "./log" (str "meta= " (meta symbol) "\n") :append true)
+    (spit "./log" (str "ns-resolve= " (first (distinct (remove nil? (map #(ns-resolve % symbol) (all-ns))))) "\n") :append true)
+    (if resolved-symbol
+      (var-get resolved-symbol)
+      symbol)))
+
 (defn- is-arrow
-  [form]
-  (or (= form '=>)
-      (= form '=not=>)))
+  [symbol]
+  (or (= (resolve-symbol symbol) =>)
+      (= (resolve-symbol symbol) =not=>)))
 
 (defn- ^{:testable true} provided-form?
   [form]
@@ -37,7 +45,7 @@
                (let [sub-provide (first r)
                      sub-fn (first sub-provide)
                      metaconst (gen-provided-sym provided-fn sub-fn)]
-                 (recur (conj provided-flattened metaconst) (into flattened-paramaters (unnest-provided [sub-provide '=> metaconst])) (rest r)))
+                 (recur (conj provided-flattened metaconst) (into flattened-paramaters (unnest-provided [sub-provide => metaconst])) (rest r)))
 
             :else (recur (conj provided-flattened (first r)) flattened-paramaters (rest r) )
             )))
@@ -69,9 +77,9 @@
   (merge
    (apply hash-map (drop 3 provided))
    {:mock-function (first (first provided))
-    :paramaters (into [] (rest (first provided)))
-    :arrow (keyword (second provided))
-    :result (nth provided 2)}))
+    :paramaters    (into [] (rest (first provided)))
+    :arrow         (resolve-symbol (second provided))
+    :result        (nth provided 2)}))
 
 (defn- parse-provided
   [forms]
@@ -128,7 +136,7 @@
          expected-form :expected-form} (deconstruct-forms forms)]
     (merge
       {:call-form            call-form
-       :arrow                arrow
+       :arrow                (resolve-symbol arrow)
        :expected-result      expected-form
        :expected-result-form `'~expected-form}
       (parse-expected expected-form)
