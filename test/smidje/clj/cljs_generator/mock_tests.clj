@@ -81,6 +81,68 @@
         (do-report (as-checker #(= :fail (:type %)))) => nil :times 1)))
 
   (fact
+    "validate-mock-called-with-expected-args passes when indicated :times calls made"
+    (let [function 'func
+          mock-config {:mock-config {[] {:result ..foo.. :times 2}},
+                       :calls       {[] 2}}]
+      (validate-mock-called-with-expected-args function mock-config) => anything
+      (provided
+        (do-report (as-checker #(= :pass (:type %)))) => nil :times 1))
+    (let [function 'func
+          mock-config {:mock-config {[] {:result ..foo.. :times 0}}}]
+      (validate-mock-called-with-expected-args function mock-config) => anything
+      (provided
+        (do-report (as-checker #(= :pass (:type %)))) => nil :times 1)))
+
+  (fact
+    "validate-mock-called-with-expected-args fails when indicated :times calls not made"
+    (let [function 'func
+          mock-config {:mock-config {[] {:result ..foo.. :times 3}},
+                       :calls       {[] 2}}]
+      (validate-mock-called-with-expected-args function mock-config) => anything
+      (provided
+        (do-report (as-checker #(= :fail (:type %)))) => nil :times 1)))
+
+  (fact
+    "validate-mock-called-with-expected-args passes when indicated :times range calls made"
+    (let [function 'func
+          mock-config {:mock-config {[] {:result ..foo.. :times {:range [5 6]}}},
+                       :calls       {[] 5}}]
+      (validate-mock-called-with-expected-args function mock-config) => anything
+      (provided
+        (do-report (as-checker #(= :pass (:type %)))) => nil :times 1))
+    (let [function 'func
+          mock-config {:mock-config {[] {:result ..foo.. :times {:range [2 7]}}},
+                       :calls       {[] 7}}]
+      (validate-mock-called-with-expected-args function mock-config) => anything
+      (provided
+        (do-report (as-checker #(= :pass (:type %)))) => nil :times 1)))
+
+  (fact
+    "validate-mock-called-with-expected-args fails when indicated :times range calls made"
+    (let [function 'func
+          mock-config {:mock-config {[] {:result ..foo.. :times {:range [2 5]}}},
+                       :calls       {[] 1}}]
+      (validate-mock-called-with-expected-args function mock-config) => anything
+      (provided
+        (do-report (as-checker #(= :fail (:type %)))) => nil :times 1))
+    (let [function 'func
+          mock-config {:mock-config {[] {:result ..foo.. :times {:range [2 5]}}},
+                       :calls       {[] 7}}]
+      (validate-mock-called-with-expected-args function mock-config) => anything
+      (provided
+        (do-report (as-checker #(= :fail (:type %)))) => nil :times 1)))
+
+  (fact
+    "validate-mock-called-with-expected-args does nothing when optional :times specified"
+    (let [function 'func
+          mock-config {:mock-config {[] {:result ..foo.. :times :optional}},
+                       :calls       {[] 7}}]
+      (validate-mock-called-with-expected-args function mock-config) => anything
+      (provided
+        (do-report anything) => nil :times 0)))
+
+  (fact
     "validate-no-unexpected-calls true when no unexpected calls"
     (let [function 'func
           mock-config {:mock-config

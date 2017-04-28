@@ -15,13 +15,20 @@
 (defn anything [a b]
   (- a b))
 
+(defn two-bars []
+  (+ (bar) (bar)))
+
+(defn n-bars [times-called]
+  (dotimes [n times-called]
+    (bar)))
+
 (fact "multi-provided"
       (foo) => 2
       (provided
         (bar) => 0
         (thing 1) => 2))
 
-(fact "name"
+(fact "arrows"
   (+ 1 1) => 2
   (+ 1 3) =not=> 2)
 
@@ -69,6 +76,20 @@
   (thing 1) =not=> ..result..
   (provided
     (thing 1) => ..badresult..))
+
+(fact
+  "times checking"
+  (two-bars) => 4
+  (provided
+    (bar) => 2 :times 2
+    (foo) => ..whatever.. :times 0
+    (thing "foo") => ..no1cur.. :times (range)))
+
+(fact
+  "more times checking"
+  (n-bars 5) => nil?
+  (provided
+    (bar) => 2 :times (range 5)))
 
 (fact
   "expects exception when thrown by provided"

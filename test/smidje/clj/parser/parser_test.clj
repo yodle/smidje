@@ -53,12 +53,23 @@
                 '((c 4) => ..b->c02..)}
             (m/provided (gensym "a->b") m/=> 'a->b01 (gensym "b->c") m/=> 'b->c02))
 
-(m/fact "seperate-provided-forms"
-        (#'smidje.parser.parser/seperate-provided-forms simple-addition-fact) => [simple-addition-fact]
-        (set  (#'smidje.parser.parser/seperate-provided-forms
+(m/fact "separate-provided-forms"
+        (#'smidje.parser.parser/separate-provided-forms simple-addition-fact) => [simple-addition-fact]
+        (set  (#'smidje.parser.parser/separate-provided-forms
                '((+ 1 1) => 2 :times 1 (* 2 3) => 6 :times 2 :except 3 (/ 4 2) => 2))) => '#{((+ 1 1) => 2 :times 1)
                                                                                       ((/ 4 2) => 2)
                                                                                      ((* 2 3) => 6 :times 2 :except 3)})
+
+(m/fact "adjust-range"
+        (adjust-range '((+ 1 1) => 2 :times 1 :except 3)) m/=> '((+ 1 1) => 2 :times 1 :except 3)
+        (adjust-range '((+ 1 1) => 2 :times (range) :except 3)) m/=> '((+ 1 1) => 2 :times :optional :except 3)
+        (adjust-range '((+ 1 1) => 2 :times (range 3) :except 3)) m/=> '((+ 1 1) => 2 :times {:range [1 3]} :except 3)
+        (adjust-range '((+ 1 1) => 2 :times (range 2 10) :except 3)) m/=> '((+ 1 1) => 2 :times {:range [2 10]} :except 3)
+        (adjust-range '((+ 1 1) => 2 :times (range 1 2 3))) m/=> (m/throws RuntimeException #"more than two arguments")
+        (adjust-range '((+ 1 1) => 2 :times (range -1 3))) m/=> (m/throws RuntimeException #"-1 must be greater than 0")
+        (adjust-range '((+ 1 1) => 2 :times (range 1 -3))) m/=> (m/throws RuntimeException #"-3 must be greater than 0")
+        (adjust-range '((+ 1 1) => 2 :times (range 3 1))) m/=> (m/throws RuntimeException #"3 must be less than or equal to 1")
+        (adjust-range '((+ 1 1) => 2 :times (range -1))) m/=> (m/throws RuntimeException #"must be greater than 0"))
 
 (m/fact "build-provided-map"
         (#'smidje.parser.parser/build-provided-map simple-addition-fact) => {:mock-function '+
