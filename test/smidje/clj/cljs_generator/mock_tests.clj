@@ -1,7 +1,8 @@
 (ns smidje.clj.cljs-generator.mock-tests
   (:require [midje.sweet :refer :all]
             [clojure.test :refer [do-report]]
-            [smidje.cljs-generator.mocks :refer :all]))
+            [smidje.cljs-generator.mocks :refer :all]
+            [smidje.core :as c]))
 
 (facts
   "generate-mock-function"
@@ -179,3 +180,32 @@
   (fact
     "throws exception on unknown arrow"
     (return-or-throw {:arrow :fake :result ..result..}) => (throws Exception "unknown arrow in provided")))
+
+(facts
+  "conditional="
+  (fact
+    "true for identical values"
+    (conditional= :v1 :v1) => true)
+  (fact
+    "false for different values"
+    (conditional= :v1 :v2) => false)
+  (fact
+    "true for a value and anything"
+    (conditional= :value c/anything) => true)
+  (fact
+    "true for a value and anything"
+    (conditional= c/anything :value) => true))
+
+(facts
+  "conditional-keymatch"
+  (fact
+    "returns key if identical"
+    (conditional-keymatch :key :key) => :key)
+  (fact
+    "returns conditional-collection-match if collections"
+    (conditional-keymatch ..c1.. ..c2..) => ..c3..
+    (provided
+      (conditional-collection-match ..c1.. ..c2..) => ..c3..))
+  (fact
+    "returns nil if different"
+    (conditional-keymatch :key1 :key2) => nil))

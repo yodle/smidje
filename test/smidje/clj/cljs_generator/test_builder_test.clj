@@ -1,7 +1,8 @@
 (ns smidje.clj.cljs-generator.test-builder-test
   (:require [midje.sweet :refer :all]
             [smidje.clj.intermediate-maps :as im]
-            [smidje.cljs-generator.test-builder :refer :all]))
+            [smidje.cljs-generator.test-builder :refer :all]
+            [smidje.core :as c]))
 
 (defmulti new-report (fn [& args] :default))
 (defmethod new-report :default [& args] {})
@@ -45,6 +46,18 @@
     (fact
       "failed assertion with constant fails"
       (eval (generate-single-assert im/simple-addition-failed-not-assertion)) => false))
+
+  (facts
+    "generate-single-assert using anything"
+    (fact
+      "using anything returns true and calls function"
+      (eval (generate-single-assert
+              {:expected-result-form 'c/anything
+               :expected-result      c/anything
+               :arrow                '=>
+               :call-form            '(--func--)})) => true
+      (provided
+        (--func--) => nil :times 1)))
 
   (fact "simple throws form correct"
         (generate-expected-exception im/expected-exception-assertion)
