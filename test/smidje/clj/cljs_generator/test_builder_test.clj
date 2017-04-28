@@ -21,7 +21,21 @@
       (eval (generate-single-assert im/simple-successful-checker-function-assertion)) => true)
     (fact
       "failed assertion with checker function fails"
-      (eval (generate-single-assert im/simple-failed-checker-function-assertion)) => false))
+      (eval (generate-single-assert im/simple-failed-checker-function-assertion)) => false)
+    (fact
+      "successful assertion with nil value"
+      (eval (generate-single-assert
+              {:expected-result-form nil
+               :expected-result      nil
+               :arrow                '=>
+               :call-form            nil})) => true)
+    (fact
+      "failed assertion with nil value"
+      (eval (generate-single-assert
+              {:expected-result-form nil
+               :expected-result      nil
+               :arrow                '=>
+               :call-form            1})) => false))
 
   (facts
     "generate-single-assert with not arrow"

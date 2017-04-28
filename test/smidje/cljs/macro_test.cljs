@@ -30,7 +30,8 @@
 
 (fact "arrows"
   (+ 1 1) => 2
-  (+ 1 3) =not=> 2)
+  (+ 1 3) =not=> 2
+      nil => nil)
 
 (tabular "tabularname"
          (fact "factname"

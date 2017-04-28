@@ -43,13 +43,16 @@
     provided))
 
 (defn generate-single-assert [assertion]
-  (let [{arrow#           :arrow
-         test-function#   :call-form
-         expected-result# :expected-result} assertion]
-    `(cond
-       (fn? ~expected-result#) (is (~(do-arrow arrow#) (~expected-result# ~test-function#) true))
-       (= ~expected-result# anything) (do ~test-function# (is true))
-       :else (is (~(do-arrow arrow#) ~test-function# ~expected-result#)))))
+  (let [{arrow           :arrow
+         test-function   :call-form
+         expected-result :expected-result} assertion]
+    ;we bind expected-result and test-function to vars so that if they are nil we don't get a compilation error
+    `(let [expected-result-var# ~expected-result
+           test-function-var# ~test-function]
+       (cond
+        (fn? expected-result-var#) (is (~(do-arrow arrow) (expected-result-var# test-function-var#) true))
+        (= expected-result-var# anything) (do test-function-var# (is true))
+        :else (is (~(do-arrow arrow) test-function-var# expected-result-var#))))))
 
 (defn generate-truth-test [truth-test-definition]
   (let [truth-type# (:truth-testing truth-test-definition)
