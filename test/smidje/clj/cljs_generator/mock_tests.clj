@@ -221,6 +221,21 @@
     (conditional-keymatch :key1 :key2) => nil))
 
 (facts
+  "conditional-collection-match"
+  (fact
+    "vectors match exactly"
+    (conditional-collection-match [1 2 3] [1 2 3]) => [1 2 3])
+  (fact
+    "vectors match with anything"
+    (conditional-collection-match [1 c/anything 3] [1 2 3]) => [1 2 3])
+  (fact
+    "lists match exactly"
+    (conditional-collection-match '(1 2 3) '(1 2 3)) => '(1 2 3))
+  (fact
+    "lists match with anything"
+    (conditional-collection-match `(1 ~c/anything 3) `(1 2 3)) => '(1 2 3)))
+
+(facts
   "find matching key"
   (fact
     "matches exact"
