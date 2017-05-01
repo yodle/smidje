@@ -47,5 +47,5 @@ Make sure that there is an open pull request bumping the version number in both 
 smidje.version file and README.md files.
 
 ```
-lein publish clojars
+lein deploy clojars
 ```

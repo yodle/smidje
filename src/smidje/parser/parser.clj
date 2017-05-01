@@ -44,9 +44,9 @@
       [provided]
       )))
 
-(defn- seperate-provided-forms
+(defn- separate-provided-forms
   [forms]
-  (loop [result [] current-form (into []  (take 3 forms)) input (drop 3 forms)]
+  (loop [result [] current-form (into [] (take 3 forms)) input (drop 3 forms)]
     (cond
       (empty? input) (conj result current-form)
 
@@ -56,6 +56,37 @@
         (recur (conj result current-form) (into []  (take 3 input)) (drop 3 input))
 
       :else (recur result (conj current-form (first input)) (rest input)))))
+
+(defn- replace-range
+  [form]
+  (let [[_ x1 x2] form]
+    (condp = (count form)
+      1 :optional
+      2 (if (< x1 1)
+          (throw (RuntimeException. (str "invalid (range) argument: " x1 ", must be greater than 0")))
+          {:range [1 x1]})
+      3 (cond
+          (< x1 1) (throw (RuntimeException. (str "invalid (range) argument: " x1 " must be greater than 0")))
+          (< x2 1) (throw (RuntimeException. (str "invalid (range) argument: " x2 " must be greater than 0")))
+          (> x1 x2) (throw (RuntimeException. (str "invalid (range) argument: " x1 " must be less than or equal to " x2)))
+          :else {:range [x1 x2]})
+      (throw (RuntimeException. "invalid (range) form: more than two arguments")))))
+
+(defn- ^{:testable true} adjust-range
+  [form]
+  (loop [result [] input form]
+    (cond
+      (empty? input) result
+      (and (= (first input) :times)
+           (> (count input) 1)
+           (list? (second input))
+           (= (first (second input)) 'range))
+        (recur
+          (conj result (first input) (replace-range (second input)))
+          (drop 2 input))
+      :else (recur
+              (conj result (first input))
+              (rest input)))))
 
 (defn- aggregate-paramater-maps
   [paramater-maps]
@@ -78,7 +109,8 @@
   (if (has-provided-form? forms)
     {:provided (->> (nth forms 3)
                     rest
-                    seperate-provided-forms
+                    separate-provided-forms
+                    (map adjust-range)
                     (mapcat unnest-provided)
                     (map build-provided-map)
                     (group-by :mock-function)
