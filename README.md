@@ -10,7 +10,7 @@ A little library for cljs testing and mocking inspired by [Midje](https://github
 
 With Leiningen
 
-[smidje "0.1.190"]
+[smidje "0.2.0"]
 
 You can find more detail about smidje syntax on our [wiki](https://github.com/yodle/smidje/wiki/Tutorial).
 
