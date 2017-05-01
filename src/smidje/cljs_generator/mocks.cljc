@@ -35,8 +35,8 @@
 
 (defn find-matching-key
   "this function returns the key from mock-config that matches request-params or nill
-  it will treat :anything as wildcard when validating that the key is valid for example
-  [1 2] will math the key in {[1 :anything] ..value..} "
+  it will treat anything (from symbols.js) as wildcard when validating that the key is valid for example
+  [1 2] will math the key in {[1 anything] ..value..} "
   [request-params mock-config]
     (some (fn [[conditional-key _]] (conditional-keymatch request-params conditional-key)) mock-config))
 

@@ -43,7 +43,17 @@
       ((generate-mock-function function mock-atom) 1) => ..result..
       (provided
         (return-or-throw {:result 1
-                          :arrow  :=>}) => ..result.. :times 1))))
+                          :arrow  :=>}) => ..result.. :times 1)))
+  (fact
+    "handles anything in mock"
+    (let [function 'func
+          mock-atom (atom {function
+                           {:mock-config
+                            {[c/anything] {:result 1
+                                 :arrow :=>}}
+                            }})]
+      ((generate-mock-function function mock-atom) 2) => 1
+      (get-in @mock-atom [function :calls [2]]) => 1)))
 
 (facts
   "mock validation"
@@ -209,3 +219,18 @@
   (fact
     "returns nil if different"
     (conditional-keymatch :key1 :key2) => nil))
+
+(facts
+  "find matching key"
+  (fact
+    "matches exact"
+    (find-matching-key [:1 :2] {[:1 :2] ..mock-info..}) => [:1 :2])
+  (fact
+    "matches anything in request"
+    (find-matching-key [c/anything c/anything] {[:1 :2] ..mock-info..}) => [:1 :2])
+  (fact
+    "matches anything in mock-config"
+    (find-matching-key [:1 :2] {[c/anything c/anything] ..mock-info..}) => [c/anything c/anything])
+  (fact
+    "matches mixed"
+    (find-matching-key [:1 c/anything] {[c/anything :2] ..mock-info..}) => [c/anything :2]))
