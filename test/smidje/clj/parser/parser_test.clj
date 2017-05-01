@@ -161,7 +161,34 @@
           (m/provided
             (gensym "smidje->mc->dash->foo->") m/=> ..gensym1..
             (gensym "smidje->mc->dot->input->") m/=> ..gensym2..
-            (gensym "smidje->mc->dot->result->") m/=> ..gensym3..)))
+            (gensym "smidje->mc->dot->result->") m/=> ..gensym3..))
+  (m/fact "returns list of expected consants given map"
+           (parse-metaconstants {:this "returns" :nothing "too"}) => {}
+
+           (parse-metaconstants {:hi '..hello..}) => {'..hello.. ..gensym..}
+           (m/provided
+             (gensym "smidje->mc->dot->hello->") m/=> ..gensym..)
+
+           (parse-metaconstants {:duplicates '..are.. :not '..are.. :a '--not-- :problem '--not--})
+           => {'..are.. ..gensym1..
+               '--not-- ..gensym2..}
+           (m/provided
+             (gensym "smidje->mc->dot->are->") m/=> ..gensym1..
+             (gensym "smidje->mc->dash->not->") m/=> ..gensym2..)
+
+           (parse-metaconstants {:val    '--also--
+                                 :nested {:val    '..it..
+                                          :nested {:val    '--will--
+                                                   :nested {:val '--flatten--}}}})
+           => {'--also--    ..gensym1..
+               '..it..      ..gensym2..
+               '--will--    ..gensym3..
+               '--flatten-- ..gensym4..}
+           (m/provided
+             (gensym "smidje->mc->dash->also->") m/=> ..gensym1..
+             (gensym "smidje->mc->dot->it->") m/=> ..gensym2..
+             (gensym "smidje->mc->dash->will->") m/=> ..gensym3..
+             (gensym "smidje->mc->dash->flatten->") m/=> ..gensym4..)))
 
 (m/fact "`replace-metaconstants` replaceces metaconstant symbols with values in symbol table"
         (replace-metaconstants {} "foo") => "foo"
